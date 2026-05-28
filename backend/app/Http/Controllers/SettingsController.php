@@ -47,7 +47,7 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'activeModel' => 'sometimes|required|string|in:Random Forest,Decision Tree,Logistic Regression',
+            'activeModel' => 'sometimes|required|string|in:Random Forest,Decision Tree',
             'rfTrees' => 'sometimes|required|integer|min:50|max:250',
             'rfMaxDepth' => 'sometimes|required|integer|min:4|max:20',
             'dtMinSamples' => 'sometimes|required|integer|min:2|max:10',

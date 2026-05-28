@@ -118,7 +118,7 @@ export const initialPatients: Patient[] = [
       { date: 'Apr', systolic: 116, diastolic: 75 },
       { date: 'May', systolic: 118, diastolic: 77 },
       { date: 'Jun', systolic: 115, diastolic: 74 },
-      { date: 'Jul', systolic: 117, pipes: 76 } as any // wait, original bpHistory has {date, systolic, diastolic}. Let's look at original: in Jan-Jul, they all have {date, systolic, diastolic}. Line 121: { date: 'Jul', systolic: 117, diastolic: 76 }
+      { date: 'Jul', systolic: 117, diastolic: 76 }
     ]
   },
   {
@@ -143,8 +143,6 @@ export const initialPatients: Patient[] = [
   }
 ];
 
-// Correcting Eko & Dewi
-initialPatients[5].bpHistory[6] = { date: 'Jul', systolic: 117, diastolic: 76 };
 
 export const initialRecords: PredictionRecord[] = [
   {

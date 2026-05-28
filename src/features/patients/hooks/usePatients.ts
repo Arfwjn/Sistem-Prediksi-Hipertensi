@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { usePatientStore } from '../../../stores/patientStore';
-import { Patient, BPHistoryEntry } from '../../../types';
+import { Patient } from '../../../types';
 
 export function usePatients() {
   const { patients, addPatient, deletePatient, editPatient } = usePatientStore();
@@ -26,22 +26,14 @@ export function usePatients() {
     );
   }, [patients, filterText]);
 
-  const handleCreatePatient = (e: React.FormEvent) => {
+  const handleCreatePatient = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim() || !newAge) {
       alert('Nama Lengkap dan Usia wajib diisi.');
       return;
     }
 
-    // Default historical simulation
-    const mockBP: BPHistoryEntry[] = [
-      { date: 'Mei', systolic: 120, diastolic: 80 },
-      { date: 'Jun', systolic: 122, diastolic: 81 },
-      { date: 'Jul', systolic: 125, diastolic: 83 }
-    ];
-
-    const newPat: Patient = {
-      id: `PT-2023-${String(patients.length + 1).padStart(3, '0')}`,
+    await addPatient({
       name: newName,
       age: Number(newAge),
       gender: newGender,
@@ -49,11 +41,7 @@ export function usePatients() {
       email: newEmail || 'pasien@gmail.com',
       address: newAddress || 'Jl. Raya Kebon Jeruk No. 5',
       status: newStatus,
-      lastChecked: new Date().toISOString().split('T')[0],
-      bpHistory: mockBP
-    };
-
-    addPatient(newPat);
+    });
     setIsAddOpen(false);
 
     // Reset Form

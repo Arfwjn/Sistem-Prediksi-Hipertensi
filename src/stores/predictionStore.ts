@@ -15,7 +15,7 @@ interface PredictionState {
 }
 
 export const usePredictionStore = create<PredictionState>((set, get) => ({
-  records: initialRecords,
+  records: [],
   isLoading: false,
   error: null,
 

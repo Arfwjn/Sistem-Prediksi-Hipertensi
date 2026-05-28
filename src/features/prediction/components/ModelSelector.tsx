@@ -22,9 +22,9 @@ export default function ModelSelector({ activeModel, onModelSelect }: ModelSelec
       </div>
 
       {/* A visual timeline path */}
-      <div className="relative flex flex-col sm:flex-row items-center justify-between gap-3 py-2">
+      <div className="relative flex flex-col sm:flex-row items-center justify-center gap-6 py-2">
         {/* SVG connecting track behind */}
-        <div className="absolute left-[15%] right-[15%] top-1/2 -translate-y-1/2 h-0.5 border-t border-dashed border-slate-200 hidden sm:block z-0" />
+        <div className="absolute left-[20%] right-[20%] top-1/2 -translate-y-1/2 h-0.5 border-t border-dashed border-slate-200 hidden sm:block z-0" />
         
         {/* Decision Tree path step */}
         <motion.button
@@ -32,7 +32,7 @@ export default function ModelSelector({ activeModel, onModelSelect }: ModelSelec
           whileTap={{ scale: 0.99 }}
           type="button"
           onClick={() => onModelSelect('Decision Tree')}
-          className={`relative flex-1 w-full p-3 rounded-xl border text-left transition-all z-10 flex items-center gap-2.5 cursor-pointer
+          className={`relative max-w-sm flex-1 w-full p-3 rounded-xl border text-left transition-all z-10 flex items-center gap-2.5 cursor-pointer
             ${activeModel === 'Decision Tree' 
               ? 'bg-blue-600 border-blue-600 text-white shadow-[0_4px_16px_rgba(37,99,235,0.2)]' 
               : 'bg-slate-50/50 hover:bg-slate-50 border-slate-200/80 text-slate-700'
@@ -63,7 +63,7 @@ export default function ModelSelector({ activeModel, onModelSelect }: ModelSelec
           whileTap={{ scale: 0.99 }}
           type="button"
           onClick={() => onModelSelect('Random Forest')}
-          className={`relative flex-1 w-full p-3 rounded-xl border text-left transition-all z-10 flex items-center gap-2.5 cursor-pointer
+          className={`relative max-w-sm flex-1 w-full p-3 rounded-xl border text-left transition-all z-10 flex items-center gap-2.5 cursor-pointer
             ${activeModel === 'Random Forest' 
               ? 'bg-blue-600 border-blue-600 text-white shadow-[0_4px_16px_rgba(37,99,235,0.2)]' 
               : 'bg-slate-50/50 hover:bg-slate-50 border-slate-200/80 text-slate-700'
@@ -84,37 +84,6 @@ export default function ModelSelector({ activeModel, onModelSelect }: ModelSelec
             </p>
           </div>
           {activeModel === 'Random Forest' && (
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          )}
-        </motion.button>
-
-        {/* Logistic Regression path step */}
-        <motion.button
-          whileHover={{ y: -1, scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          type="button"
-          onClick={() => onModelSelect('Logistic Regression')}
-          className={`relative flex-1 w-full p-3 rounded-xl border text-left transition-all z-10 flex items-center gap-2.5 cursor-pointer
-            ${activeModel === 'Logistic Regression' 
-              ? 'bg-blue-600 border-blue-600 text-white shadow-[0_4px_16px_rgba(37,99,235,0.2)]' 
-              : 'bg-slate-50/50 hover:bg-slate-50 border-slate-200/80 text-slate-700'
-            }`}
-        >
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs select-none shadow-sm transition-colors
-            ${activeModel === 'Logistic Regression' 
-              ? 'bg-white/10 text-white' 
-              : 'bg-indigo-500/10 text-indigo-700 border border-indigo-500/20'
-            }`}
-          >
-            LR
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold truncate">Logistic Reg.</p>
-            <p className={`text-[9px] truncate ${activeModel === 'Logistic Regression' ? 'text-blue-100/90 font-semibold' : 'text-slate-400 font-semibold'}`}>
-              Statistik Linear
-            </p>
-          </div>
-          {activeModel === 'Logistic Regression' && (
             <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
           )}
         </motion.button>

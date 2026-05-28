@@ -165,10 +165,9 @@ class PredictionController extends Controller
 
         if ($model === 'Random Forest') {
             $score = $score * $config->confidence_factor + ($config->rf_trees > 50 ? 1.5 : 0);
-        } elseif ($model === 'Decision Tree') {
-            $score = $score * 0.92 + ($config->dt_min_samples > 2 ? 0.8 : -1.2);
         } else {
-            $score = $score * 0.89 + ($config->lr_iterations > 100 ? 1.2 : 0);
+            // Decision Tree
+            $score = $score * 0.92 + ($config->dt_min_samples > 2 ? 0.8 : -1.2);
         }
 
         return max(76, min(99, (int)round($score)));

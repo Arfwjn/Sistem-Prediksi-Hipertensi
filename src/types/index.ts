@@ -22,7 +22,7 @@ export interface PredictionRecord {
   patientId: string;
   patientName: string;
   date: string;
-  modelUsed: 'Random Forest' | 'Decision Tree' | 'Logistic Regression';
+  modelUsed: 'Random Forest' | 'Decision Tree';
   confidenceScore: number;
   systolic: number;
   diastolic: number;
@@ -44,7 +44,7 @@ export interface DoctorProfile {
 }
 
 export interface AIModelConfig {
-  activeModel: 'Random Forest' | 'Decision Tree' | 'Logistic Regression';
+  activeModel: 'Random Forest' | 'Decision Tree';
   rfTrees: number;
   rfMaxDepth: number;
   dtMinSamples: number;

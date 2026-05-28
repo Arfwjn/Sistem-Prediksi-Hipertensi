@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { usePredictionStore } from '../../../stores/predictionStore';
 import { useSettingsStore } from '../../../stores/settingsStore';
-import { calculateBMI } from '../../../utils/bmi';
 import { HypertensionLevel } from '../../../utils/hypertension';
-import { PredictionRecord } from '../../../types';
+import { AIModelConfig } from '../../../types';
 
 export function usePrediction() {
   const modelConfig = useSettingsStore((state) => state.modelConfig);
@@ -29,18 +28,23 @@ export function usePrediction() {
     setActiveModel(modelConfig.activeModel);
   }, [modelConfig.activeModel]);
 
-  // Auto-calculate BMI
+  // Auto-calculate BMI (local preview, backend recalculates authoritatively)
   useEffect(() => {
     if (typeof berat === 'number' && typeof tinggi === 'number' && tinggi > 0) {
-      setBmi(calculateBMI(berat, tinggi));
+      const heightM = tinggi / 100;
+      setBmi(Math.round((berat / (heightM * heightM)) * 10) / 10);
     } else {
       setBmi(0);
     }
   }, [berat, tinggi]);
 
-  const handleModelSelect = (selectedModel: PredictionRecord['modelUsed']) => {
+  const handleModelSelect = async (selectedModel: AIModelConfig['activeModel']) => {
     setActiveModel(selectedModel);
-    useSettingsStore.getState().updateModelConfig({ activeModel: selectedModel });
+    try {
+      await useSettingsStore.getState().updateModelConfig({ activeModel: selectedModel });
+    } catch (e) {
+      console.error('Failed to update model selection:', e);
+    }
   };
 
   const handleClassify = async () => {

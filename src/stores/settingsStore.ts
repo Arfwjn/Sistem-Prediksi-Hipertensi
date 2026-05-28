@@ -46,10 +46,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     try {
       await settingsService.resetDatabase();
       
-      // Successfully re-migrated and seeded on server! Reset all stores locally to stay fully in sync:
-      usePatientStore.getState().resetPatients();
-      usePredictionStore.getState().resetRecords();
-      set({ modelConfig: defaultModelConfig, isLoading: false });
+      // Re-fetch fresh data from the newly seeded database
+      await usePatientStore.getState().fetchPatients();
+      await usePredictionStore.getState().fetchRecords();
+      const freshConfig = await settingsService.getConfig();
+      set({ modelConfig: freshConfig, isLoading: false });
     } catch (e: any) {
       set({ isLoading: false, error: 'Gagal mereset database klinis.' });
       throw e;

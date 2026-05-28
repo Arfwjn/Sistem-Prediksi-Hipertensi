@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../../stores/authStore';
 import { useSettingsStore } from '../../../stores/settingsStore';
-import { usePatientStore } from '../../../stores/patientStore';
-import { usePredictionStore } from '../../../stores/predictionStore';
-import { AIModelConfig } from '../../../types';
+
 
 export function useSettings() {
   const { doctor, updateDoctor, logout } = useAuthStore();
@@ -59,31 +57,31 @@ export function useSettings() {
     triggerToast('Konfigurasi Parameter AI berhasil disimpan!');
   };
 
-  const handleResetDatabase = () => {
+  const handleResetDatabase = async () => {
     if (confirm('Apakah Anda yakin ingin mereset seluruh database riwayat prediksi dan pasien ke setelan bawaan klinis?')) {
-      usePatientStore.getState().resetPatients();
-      usePredictionStore.getState().resetRecords();
-      useSettingsStore.getState().resetSettings();
-      // Keep doc logged in but reset to default doc info except name (optional, or fully reset authStore)
-      useAuthStore.getState().updateDoctor({
-        name: 'Dr. Arief Sidik',
-        specialty: 'Cardiologist',
-        hospital: 'Heart & Vascular Center',
-      });
+      try {
+        await useSettingsStore.getState().resetDatabase();
 
-      // Reset local fields
-      setDocName('Dr. Arief Sidik');
-      setDocSpecialty('Cardiologist');
-      setDocHospital('Heart & Vascular Center');
-      
-      setActiveModel('Random Forest');
-      setRfTrees(100);
-      setRfMaxDepth(12);
-      setDtMinSamples(4);
-      setLrIterations(200);
-      setConfidenceFactor(0.98);
+        // Re-sync local form state from the refreshed store values
+        const refreshedConfig = useSettingsStore.getState().modelConfig;
+        const refreshedDoctor = useAuthStore.getState().doctor;
 
-      triggerToast('Database berhasil di-reset ke nilai default klinis.');
+        setDocName(refreshedDoctor.name);
+        setDocSpecialty(refreshedDoctor.specialty);
+        setDocHospital(refreshedDoctor.hospital);
+
+        setActiveModel(refreshedConfig.activeModel);
+        setRfTrees(refreshedConfig.rfTrees);
+        setRfMaxDepth(refreshedConfig.rfMaxDepth);
+        setDtMinSamples(refreshedConfig.dtMinSamples);
+        setLrIterations(refreshedConfig.lrIterations);
+        setConfidenceFactor(refreshedConfig.confidenceFactor);
+
+        triggerToast('Database berhasil di-reset ke nilai default klinis.');
+      } catch (e) {
+        console.error('Failed to reset database:', e);
+        alert('Gagal mereset database. Pastikan backend server Anda berjalan.');
+      }
     }
   };
 

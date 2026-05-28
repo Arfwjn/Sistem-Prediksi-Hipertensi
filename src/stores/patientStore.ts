@@ -16,7 +16,7 @@ interface PatientState {
 }
 
 export const usePatientStore = create<PatientState>((set, get) => ({
-  patients: initialPatients,
+  patients: [],
   isLoading: false,
   error: null,
 

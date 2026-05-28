@@ -117,7 +117,6 @@ export default function SettingsPage() {
               options={[
                 { value: 'Random Forest', label: 'Random Forest (Sangat Akurat)' },
                 { value: 'Decision Tree', label: 'Decision Tree (Sedang)' },
-                { value: 'Logistic Regression', label: 'Logistic Regression (Asosiatif)' },
               ]}
             />
 
@@ -129,7 +128,7 @@ export default function SettingsPage() {
                 className="space-y-4 border-l-2 border-blue-500 pl-4 py-1"
               >
                 <div className="space-y-1">
-                  <div className="flex justify-between items-center text-xs text-slate-650 font-bold">
+                  <div className="flex justify-between items-center text-xs text-slate-655 font-bold">
                     <span>Jumlah Estimator Pohon (Trees)</span>
                     <span className="text-blue-600">{rfTrees}</span>
                   </div>
@@ -180,28 +179,6 @@ export default function SettingsPage() {
                     value={dtMinSamples}
                     onChange={(e) => setDtMinSamples(Number(e.target.value))}
                     className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
-                  />
-                </div>
-              </motion.div>
-            )}
-
-            {/* Logistic regression inputs */}
-            {activeModel === 'Logistic Regression' && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-4 border-l-2 border-indigo-500 pl-4 py-1"
-              >
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-655 block uppercase tracking-wide">Maksimal Iterasi Konvergensi</label>
-                  <input
-                    type="number"
-                    min="50"
-                    max="1000"
-                    step="50"
-                    value={lrIterations}
-                    onChange={(e) => setLrIterations(Number(e.target.value))}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 text-xs font-semibold text-slate-800 focus:outline-none"
                   />
                 </div>
               </motion.div>

@@ -15,6 +15,11 @@ export default function StatsCards() {
     (p) => p.status === 'Tingkat 2' || p.status === 'Krisis Hipertensi'
   ).length;
 
+  // Average confidence score computed from real prediction records
+  const avgConfidence = records.length > 0
+    ? (records.reduce((sum, r) => sum + r.confidenceScore, 0) / records.length).toFixed(1)
+    : null;
+
   const activeModel = modelConfig.activeModel;
 
   return (
@@ -28,11 +33,10 @@ export default function StatsCards() {
           <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl">
             <Activity className="w-6 h-6" />
           </div>
-          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">+12%</span>
         </div>
         <div className="mt-6">
-          <p className="text-xs font-semibold text-slate-400">Total Prediksi</p>
-          <p className="text-3xl font-bold text-slate-900 mt-1">{1123 + records.length}</p>
+          <p className="text-xs font-semibold text-slate-400">Total Pasien</p>
+          <p className="text-3xl font-bold text-slate-900 mt-1">{patients.length}</p>
         </div>
       </motion.div>
 
@@ -48,8 +52,8 @@ export default function StatsCards() {
           <span className="text-xs font-bold text-slate-500 bg-slate-100/80 px-2 py-0.5 rounded-full border border-slate-200 select-none">Medis</span>
         </div>
         <div className="mt-6">
-          <p className="text-xs font-semibold text-slate-400">Akurasi Model (RF)</p>
-          <p className="text-3xl font-bold text-slate-900 mt-1">94.8%</p>
+          <p className="text-xs font-semibold text-slate-400">Rata-rata Confidence</p>
+          <p className="text-3xl font-bold text-slate-900 mt-1">{avgConfidence !== null ? `${avgConfidence}%` : '—'}</p>
         </div>
       </motion.div>
 
@@ -83,11 +87,10 @@ export default function StatsCards() {
           <div className="p-3 bg-red-50 text-red-600 border border-red-100 rounded-xl">
             <AlertTriangle className="w-6 h-6" />
           </div>
-          <span className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-full">+5%</span>
         </div>
         <div className="mt-6">
           <p className="text-xs font-semibold text-slate-400">Pasien Risiko Tinggi (Tingkat 2+)</p>
-          <p className="text-3xl font-bold text-rose-600 mt-1">{29 + highRiskPatientsCount}</p>
+          <p className="text-3xl font-bold text-rose-600 mt-1">{highRiskPatientsCount}</p>
         </div>
       </motion.div>
     </section>
