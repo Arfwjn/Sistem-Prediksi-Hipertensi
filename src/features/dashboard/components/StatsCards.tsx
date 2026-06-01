@@ -1,9 +1,9 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { Activity, BrainCircuit, Cpu, AlertTriangle } from 'lucide-react';
 import { usePredictionStore } from '../../../stores/predictionStore';
 import { usePatientStore } from '../../../stores/patientStore';
 import { useSettingsStore } from '../../../stores/settingsStore';
+import { GlowCard } from '../../../components/ui/spotlight-card';
 
 export default function StatsCards() {
   const records = usePredictionStore((state) => state.records);
@@ -25,9 +25,10 @@ export default function StatsCards() {
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
       {/* Metric 1: Total Prediksi */}
-      <motion.div 
-        whileHover={{ y: -3, scale: 1.01 }}
-        className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.03)] flex flex-col justify-between"
+      <GlowCard 
+        className="p-6 flex flex-col justify-between"
+        glowColor="blue"
+        customSize={true}
       >
         <div className="flex justify-between items-start">
           <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl">
@@ -38,12 +39,13 @@ export default function StatsCards() {
           <p className="text-xs font-semibold text-slate-400">Total Pasien</p>
           <p className="text-3xl font-bold text-slate-900 mt-1">{patients.length}</p>
         </div>
-      </motion.div>
+      </GlowCard>
 
       {/* Metric 2: Akurasi Model */}
-      <motion.div 
-        whileHover={{ y: -3, scale: 1.01 }}
-        className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.03)] flex flex-col justify-between"
+      <GlowCard 
+        className="p-6 flex flex-col justify-between"
+        glowColor="orange"
+        customSize={true}
       >
         <div className="flex justify-between items-start">
           <div className="p-3 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl">
@@ -55,16 +57,16 @@ export default function StatsCards() {
           <p className="text-xs font-semibold text-slate-400">Rata-rata Confidence</p>
           <p className="text-3xl font-bold text-slate-900 mt-1">{avgConfidence !== null ? `${avgConfidence}%` : '—'}</p>
         </div>
-      </motion.div>
+      </GlowCard>
 
       {/* Metric 3: Classifier Aktif */}
-      <motion.div 
-        whileHover={{ y: -3, scale: 1.01 }}
-        className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col justify-between"
+      <GlowCard 
+        className="p-6 relative overflow-hidden flex flex-col justify-between"
+        glowColor="purple"
+        customSize={true}
       >
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-600" />
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-blue-550/10 text-blue-600 border border-blue-100/50 rounded-xl">
+          <div className="p-3 bg-blue-555/10 text-blue-600 border border-blue-100/50 rounded-xl">
             <Cpu className="w-6 h-6" />
           </div>
           <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
@@ -76,12 +78,13 @@ export default function StatsCards() {
           <p className="text-xs font-semibold text-slate-400 text-left">Model Classifier Aktif</p>
           <p className="text-xl font-bold text-slate-900 mt-1.5 text-left truncate">{activeModel} v2</p>
         </div>
-      </motion.div>
+      </GlowCard>
 
       {/* Metric 4: Pasien Risiko Tinggi */}
-      <motion.div 
-        whileHover={{ y: -3, scale: 1.01 }}
-        className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.03)] flex flex-col justify-between"
+      <GlowCard 
+        className="p-6 flex flex-col justify-between"
+        glowColor="red"
+        customSize={true}
       >
         <div className="flex justify-between items-start">
           <div className="p-3 bg-red-50 text-red-600 border border-red-100 rounded-xl">
@@ -92,7 +95,7 @@ export default function StatsCards() {
           <p className="text-xs font-semibold text-slate-400">Pasien Risiko Tinggi (Tingkat 2+)</p>
           <p className="text-3xl font-bold text-rose-600 mt-1">{highRiskPatientsCount}</p>
         </div>
-      </motion.div>
+      </GlowCard>
     </section>
   );
 }

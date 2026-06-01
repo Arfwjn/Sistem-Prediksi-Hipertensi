@@ -73,7 +73,7 @@ export default function Header() {
               setNotificationsOpen(!notificationsOpen);
               setProfileDropdownOpen(false);
             }}
-            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-100 p-2.5 rounded-2xl transition-all relative cursor-pointer animate-pulse"
+            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-100 p-2.5 rounded-2xl transition-all duration-200 relative cursor-pointer"
           >
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1.5 w-2 h-2 rounded-full bg-red-500" />

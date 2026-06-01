@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
 export const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL as string) || 'http://localhost:8000/api',
+  baseURL: (import.meta.env.VITE_API_URL as string) || '/api',
   headers: {
     'Content-Type': 'application/json',
   },

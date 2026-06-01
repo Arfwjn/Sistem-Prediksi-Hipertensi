@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePatientStore } from '../../../stores/patientStore';
+import { GlowCard } from '../../../components/ui/spotlight-card';
 
 export default function BPTrendChart() {
   const [hoveredTrendIndex, setHoveredTrendIndex] = useState<number | null>(null);
@@ -70,12 +71,16 @@ export default function BPTrendChart() {
 
   if (!chartData) {
     return (
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_10px_40px_-5px_rgba(30,41,59,0.04)] relative text-left">
+      <GlowCard 
+        className="p-6 relative text-left"
+        glowColor="blue"
+        customSize={true}
+      >
         <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Tren Tekanan Darah (Klinis)</h4>
         <div className="h-64 flex items-center justify-center">
           <p className="text-sm text-slate-400 font-medium">Belum ada data riwayat tekanan darah pasien.</p>
         </div>
-      </div>
+      </GlowCard>
     );
   }
 
@@ -84,7 +89,11 @@ export default function BPTrendChart() {
   const diaPoints = getPoints(diastolicValues, diastolicValues.length);
 
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_10px_40px_-5px_rgba(30,41,59,0.04)] relative text-left">
+    <GlowCard 
+      className="p-6 relative text-left"
+      glowColor="blue"
+      customSize={true}
+    >
       <div className="flex justify-between items-center mb-6">
         <div>
           <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Tren Tekanan Darah (Klinis)</h4>
@@ -239,6 +248,6 @@ export default function BPTrendChart() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </GlowCard>
   );
 }

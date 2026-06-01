@@ -4,6 +4,7 @@ import { Search, Download, Trash2, ChevronLeft, ChevronRight, Activity, Calendar
 import { useHistory } from '../features/history/hooks/useHistory';
 import { Badge } from '../components/ui/Badge';
 import { formatDateTime } from '../utils/format';
+import { Button } from '../components/ui/Button';
 
 export default function HistoryPage() {
   const {
@@ -49,24 +50,24 @@ export default function HistoryPage() {
         
         {/* Export Buttons */}
         <div className="flex gap-2">
-          <motion.button
-            whileTap={{ scale: 0.98 }}
+          <Button
+            size="sm"
+            variant="primary"
             disabled={exporting}
             onClick={() => handleExport('PDF')}
-            className="bg-gradient-to-r from-blue-600 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <Download className="w-4 h-4" />
             <span>Export PDF</span>
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.98 }}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
             disabled={exporting}
             onClick={() => handleExport('CSV')}
-            className="bg-slate-100 hover:bg-slate-200 text-slate-750 font-bold text-xs py-2.5 px-4 border border-slate-200 rounded-xl transition-all disabled:opacity-50 cursor-pointer"
           >
             <Download className="w-4 h-4" />
             <span>Export CSV</span>
-          </motion.button>
+          </Button>
         </div>
       </div>
 
@@ -142,16 +143,14 @@ export default function HistoryPage() {
                       </td>
                       <td className="py-4.5 px-6 text-center">
                         <div className="flex justify-center">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                          <button
                             onClick={() => handleDeleteRecord(item.id)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 group-hover:bg-red-50 text-slate-400 group-hover:text-red-700 border border-slate-200/50 group-hover:border-red-200 rounded-xl transition-all duration-200 cursor-pointer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 group-hover:bg-red-50 text-slate-400 group-hover:text-red-600 border border-slate-200/50 group-hover:border-red-200 rounded-xl transition-all duration-200 cursor-pointer hover:shadow-sm active:scale-[0.97]"
                             title="Hapus Data Prediksi"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span className="text-[10px] font-bold">Hapus</span>
-                          </motion.button>
+                          </button>
                         </div>
                       </td>
                     </motion.tr>

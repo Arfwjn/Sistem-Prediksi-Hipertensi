@@ -4,6 +4,7 @@ import { Activity } from 'lucide-react';
 import ConfidenceGauge from './ConfidenceGauge';
 import StageIndicator from './StageIndicator';
 import { HypertensionLevel } from '../../../utils/hypertension';
+import { GlowCard } from '../../../components/ui/spotlight-card';
 
 interface PredictionResultProps {
   result: HypertensionLevel;
@@ -12,15 +13,18 @@ interface PredictionResultProps {
 }
 
 export default function PredictionResult({ result, confidence, activeModel }: PredictionResultProps) {
-  return (
-    <div className="p-6 bg-gradient-to-br from-white to-slate-50/80 border border-slate-200 rounded-2xl flex-1 flex flex-col justify-center text-center relative overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.02)] min-h-[380px]">
-      {/* Visual alignment left indicator */}
-      <div className={`absolute left-0 top-0 bottom-0 w-2 
-        ${result === 'Normal' ? 'bg-emerald-500' :
-          result === 'Pra Hipertensi' ? 'bg-amber-400' :
-          result === 'Tingkat 1' ? 'bg-orange-500' : 'bg-red-650'}`} 
-      />
+  const getGlowColor = (): 'green' | 'orange' | 'red' | 'blue' => {
+    if (result === 'Normal') return 'green';
+    if (result === 'Pra Hipertensi' || result === 'Tingkat 1') return 'orange';
+    return 'red';
+  };
 
+  return (
+    <GlowCard 
+      className="p-6 flex flex-col justify-center text-center min-h-[380px]"
+      glowColor={getGlowColor()}
+      customSize={true}
+    >
       <div className="mb-4">
         <span className={`inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-bold border rounded-full shadow-sm
           ${result === 'Normal' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
@@ -47,6 +51,6 @@ export default function PredictionResult({ result, confidence, activeModel }: Pr
 
       {/* 4-bar Stage Indicator */}
       <StageIndicator result={result} />
-    </div>
+    </GlowCard>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePatientStore } from '../../../stores/patientStore';
+import { GlowCard } from '../../../components/ui/spotlight-card';
 
 const DONUT_RADIUS = 35;
 const CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS; // ≈ 219.91
@@ -44,7 +45,11 @@ export default function DiagnosisDonut() {
   const hasData = patients.length > 0;
 
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_10px_40px_-5px_rgba(30,41,59,0.04)] relative text-left">
+    <GlowCard 
+      className="p-6 relative text-left"
+      glowColor="green"
+      customSize={true}
+    >
       <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-1">Distribusi Diagnosis</h4>
       <p className="text-xs text-slate-400 font-medium mb-6">Persentase profil diagnosis rekam klinis sistem</p>
 
@@ -141,6 +146,6 @@ export default function DiagnosisDonut() {
           </div>
         </div>
       )}
-    </div>
+    </GlowCard>
   );
 }

@@ -189,7 +189,9 @@ export default function SettingsPage() {
               <div className="flex justify-between items-center text-xs text-slate-655 font-bold">
                 <span className="flex items-center gap-1.5">
                   Faktor Kepercayaan AI
-                  <Info className="w-3.5 h-3.5 text-slate-400 cursor-help" title="Skala pengubah bias skor probabilitas kepercayaan hasil prediksi" />
+                  <span title="Skala pengubah bias skor probabilitas kepercayaan hasil prediksi">
+                    <Info className="w-3.5 h-3.5 text-slate-400 cursor-help" />
+                  </span>
                 </span>
                 <span className="text-blue-600 font-bold">{confidenceFactor}x</span>
               </div>
@@ -208,7 +210,7 @@ export default function SettingsPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full py-3 flex items-center justify-center gap-2 bg-slate-900 border-slate-900 hover:bg-slate-950 text-white"
+                className="w-full py-3 flex items-center justify-center gap-2"
               >
                 <span>Terapkan Parameter AI</span>
               </Button>
