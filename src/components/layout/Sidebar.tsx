@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, History, Users, Settings, LogOut, Heart, X } from 'lucide-react';
+import { LayoutDashboard, History, Users, Settings, LogOut, Heart, X, BrainCircuit } from 'lucide-react';
 import { useUIStore } from '../../stores/uiStore';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -16,11 +16,17 @@ export default function Sidebar() {
       path: '/dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
-      description: 'Hasil klasifikasi & tren BP'
+      description: 'Tren BP & statistik klinis'
+    },
+    {
+      path: '/sistem-klasifikasi',
+      label: 'Sistem Klasifikasi',
+      icon: BrainCircuit,
+      description: 'Form input klinis pasien'
     },
     {
       path: '/history',
-      label: 'Riwayat Prediksi',
+      label: 'Riwayat Pasien',
       icon: History,
       description: 'Laporan klinis terekam'
     },

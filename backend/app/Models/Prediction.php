@@ -27,6 +27,8 @@ class Prediction extends Model
         'height',
         'bmi',
         'result',
+        'accuracy_dt',
+        'accuracy_rf',
     ];
 
     /**

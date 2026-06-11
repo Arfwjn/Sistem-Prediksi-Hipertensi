@@ -66,6 +66,13 @@ class PatientController extends Controller
             'bp_history' => $mockBPHistory
         ]);
 
+        \App\Models\Notification::logActivity(
+            $request->user()->id,
+            'Pasien Terdaftar',
+            "Mendaftarkan pasien baru '{$patient->name}' (ID: {$patient->id}) ke dalam registri klinis.",
+            'success'
+        );
+
         return response()->json(new PatientResource($patient), 201);
     }
 
@@ -88,15 +95,30 @@ class PatientController extends Controller
 
         $patient->update($validated);
 
+        \App\Models\Notification::logActivity(
+            $request->user()->id,
+            'Data Pasien Diperbarui',
+            "Memperbarui profil data klinis untuk pasien '{$patient->name}' (ID: {$patient->id}).",
+            'info'
+        );
+
         return new PatientResource($patient);
     }
 
     /**
      * Remove the specified patient from registry
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $patient = Patient::findOrFail($id);
+        
+        \App\Models\Notification::logActivity(
+            $request->user()->id,
+            'Pasien Dihapus',
+            "Menghapus data pasien '{$patient->name}' (ID: {$patient->id}) secara permanen dari registri.",
+            'danger'
+        );
+
         $patient->delete();
 
         return response()->json([

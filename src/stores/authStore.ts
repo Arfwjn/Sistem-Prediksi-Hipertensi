@@ -3,6 +3,7 @@ import { DoctorProfile } from '../types';
 import { defaultDoctor } from '../constants/mockData';
 import { authService } from '../services/authService';
 import { settingsService } from '../services/settingsService';
+import { useNotificationStore } from './notificationStore';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -75,6 +76,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         doctor: updatedDoctor,
         isLoading: false,
       });
+      useNotificationStore.getState().fetchNotifications();
     } catch (e: any) {
       const errorMsg = e.response?.data?.message || 'Gagal mengupdate profil dokter.';
       set({ isLoading: false, error: errorMsg });

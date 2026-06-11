@@ -33,6 +33,13 @@ class AuthController extends Controller
         // Create new Sanctum personal access token
         $token = $user->createToken('clinician-session')->plainTextToken;
 
+        \App\Models\Notification::logActivity(
+            $user->id,
+            'Sesi Masuk Berhasil',
+            "Pengguna Dr. {$user->name} berhasil masuk ke dalam sistem intelligence.",
+            'success'
+        );
+
         return response()->json([
             'token' => $token,
             'doctor' => new DoctorProfileResource($user)
@@ -52,7 +59,15 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        \App\Models\Notification::logActivity(
+            $user->id,
+            'Keluar Sistem',
+            "Sesi masuk Dr. {$user->name} telah diakhiri dengan aman.",
+            'info'
+        );
+
+        $user->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Berhasil logout, session token dicabut.'

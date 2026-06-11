@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
+import ClassificationPage from '../pages/ClassificationPage';
 import HistoryPage from '../pages/HistoryPage';
 import PatientsPage from '../pages/PatientsPage';
 import SettingsPage from '../pages/SettingsPage';
@@ -29,6 +30,10 @@ export const routes: RouteObject[] = [
       {
         path: 'dashboard',
         element: <DashboardPage />,
+      },
+      {
+        path: 'sistem-klasifikasi',
+        element: <ClassificationPage />,
       },
       {
         path: 'history',

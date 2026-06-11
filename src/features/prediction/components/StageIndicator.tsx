@@ -16,11 +16,11 @@ export default function StageIndicator({ result }: StageIndicatorProps) {
         <div className={`h-2 rounded-full transition-all duration-300 ${result === 'Tingkat 2' || result === 'Krisis Hipertensi' ? 'bg-red-600 shadow-sm shadow-red-200' : 'bg-red-100 opacity-40'}`} />
       </div>
       
-      <div className="grid grid-cols-4 gap-1.5 max-w-[280px] mx-auto w-full mt-1.5 text-[9px] font-bold text-slate-400 uppercase select-none">
-        <span className={result === 'Normal' ? 'text-emerald-700 font-extrabold' : ''}>Normal</span>
-        <span className={result === 'Pra Hipertensi' ? 'text-amber-600 font-extrabold' : ''}>Pra</span>
-        <span className={result === 'Tingkat 1' ? 'text-orange-600 font-extrabold' : ''}>Tingkat 1</span>
-        <span className={result === 'Tingkat 2' || result === 'Krisis Hipertensi' ? 'text-red-700 font-extrabold' : ''}>Tingkat 2</span>
+      <div className="grid grid-cols-4 gap-1.5 max-w-[280px] mx-auto w-full mt-1.5 text-[9px] font-extrabold text-slate-900 dark:text-slate-100 uppercase select-none">
+        <span className={result === 'Normal' ? 'text-emerald-700 dark:text-emerald-400 font-black scale-105' : 'text-slate-500 dark:text-slate-400 font-semibold'}>Normal</span>
+        <span className={result === 'Pra Hipertensi' ? 'text-amber-700 dark:text-amber-450 font-black scale-105' : 'text-slate-500 dark:text-slate-400 font-semibold'}>Pra</span>
+        <span className={result === 'Tingkat 1' ? 'text-orange-700 dark:text-orange-450 font-black scale-105' : 'text-slate-500 dark:text-slate-400 font-semibold'}>Tingkat 1</span>
+        <span className={result === 'Tingkat 2' || result === 'Krisis Hipertensi' ? 'text-red-700 dark:text-red-450 font-black scale-105' : 'text-slate-500 dark:text-slate-400 font-semibold'}>Tingkat 2</span>
       </div>
     </div>
   );

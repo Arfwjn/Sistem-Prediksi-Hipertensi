@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('date');
             $table->string('model_used'); // e.g. Random Forest, Decision Tree, Logistic Regression
             $table->integer('confidence_score');
+            $table->integer('accuracy_dt')->nullable();
+            $table->integer('accuracy_rf')->nullable();
             $table->integer('systolic');
             $table->integer('diastolic');
             $table->integer('age');

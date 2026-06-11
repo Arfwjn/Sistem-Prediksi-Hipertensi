@@ -22,8 +22,10 @@ export interface PredictionRecord {
   patientId: string;
   patientName: string;
   date: string;
-  modelUsed: 'Random Forest' | 'Decision Tree';
+  modelUsed: string;
   confidenceScore: number;
+  accuracyDT?: number;
+  accuracyRF?: number;
   systolic: number;
   diastolic: number;
   age: number;
@@ -51,3 +53,13 @@ export interface AIModelConfig {
   lrIterations: number;
   confidenceFactor: number; // multiplier for realism tweaking
 }
+
+export interface ActivityNotification {
+  id: number;
+  title: string;
+  desc: string;
+  type: 'info' | 'success' | 'warning' | 'danger';
+  isRead: boolean;
+  createdAt: string;
+}
+

@@ -3,6 +3,7 @@ import { PredictionRecord } from '../types';
 import { initialRecords } from '../constants/mockData';
 import { usePatientStore } from './patientStore';
 import { predictionService, ClassifyPayload } from '../services/predictionService';
+import { useNotificationStore } from './notificationStore';
 
 interface PredictionState {
   records: PredictionRecord[];
@@ -42,6 +43,7 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
 
       // Dynamically trigger patient store to load live updated patient status and BP histories!
       usePatientStore.getState().fetchPatients();
+      useNotificationStore.getState().fetchNotifications();
 
       return savedRecord;
     } catch (e: any) {
@@ -58,6 +60,7 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
         records: state.records.filter((r) => r.id !== id),
         isLoading: false,
       }));
+      useNotificationStore.getState().fetchNotifications();
     } catch (e: any) {
       set({ isLoading: false, error: 'Gagal menghapus catatan prediksi.' });
       throw e;

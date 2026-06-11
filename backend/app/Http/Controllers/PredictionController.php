@@ -46,14 +46,14 @@ class PredictionController extends Controller
         $heightInMeters = $tinggi / 100;
         $bmi = round($berat / ($heightInMeters * $heightInMeters), 1);
 
-        // 2. Classify Hypertension Stage
-        $result = $this->classifyHypertension($sistolik, $diastolik);
+        // 2. Classify base hypertension stage
+        $baseResult = $this->classifyHypertension($sistolik, $diastolik);
 
-        // 3. Fetch AI model hyperparameters config
+        // 3. Fetch AI model config
         $config = ModelConfig::first();
         if (!$config) {
             $config = ModelConfig::create([
-                'active_model' => 'Random Forest',
+                'active_model' => 'Ensemble (DT & RF)',
                 'rf_trees' => 100,
                 'rf_max_depth' => 12,
                 'dt_min_samples' => 4,
@@ -62,26 +62,32 @@ class PredictionController extends Controller
             ]);
         }
 
-        $activeModel = $config->active_model;
+        // 4. Calculate DT & RF accuracies and average them
+        $scores = $this->getModelScores($baseResult, $sistolik, $diastolik, $usia, $bmi, $config);
+        $accuracyDT = $scores['dt'];
+        $accuracyRF = $scores['rf'];
+        $avgScore = ($accuracyDT + $accuracyRF) / 2;
 
-        // 4. Generate Confidence Score
-        $confidence = $this->generateConfidenceScore($sistolik, $diastolik, $usia, $bmi, $activeModel, $config);
+        // 5. Determine final hypertension stage based on average accuracy
+        $result = $this->determineClassFromAverage($avgScore, $sistolik, $diastolik);
 
-        // 5. Generate prediction record primary key
+        // 6. Generate prediction record primary key
         $count = Prediction::count();
         $generatedId = 'PAS-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
 
         $patientId = $validated['patientId'] ?? ('PT-2023-' . rand(100, 999));
         $patientName = $validated['patientName'] ?? 'Pasien Rawat Jalan';
 
-        // 6. Save prediction record
+        // 7. Save prediction record
         $prediction = Prediction::create([
             'id' => $generatedId,
             'patient_id' => $patientId,
             'patient_name' => $patientName,
             'date' => now()->locale('id-ID')->isoFormat('DD MMM YYYY, HH:mm') . ' WIB',
-            'model_used' => $activeModel,
-            'confidence_score' => $confidence,
+            'model_used' => 'Ensemble (DT & RF)',
+            'confidence_score' => (int)round($avgScore),
+            'accuracy_dt' => $accuracyDT,
+            'accuracy_rf' => $accuracyRF,
             'systolic' => $sistolik,
             'diastolic' => $diastolik,
             'age' => $usia,
@@ -92,7 +98,7 @@ class PredictionController extends Controller
             'result' => $result,
         ]);
 
-        // 7. Auto-update matched patient status and BP history registry if exists!
+        // 8. Auto-update matched patient status and BP history registry if exists!
         $patient = Patient::where('id', $patientId)
             ->orWhere('name', 'LIKE', $patientName)
             ->first();
@@ -100,7 +106,6 @@ class PredictionController extends Controller
         if ($patient) {
             $currentMonth = now()->locale('id-ID')->isoFormat('MMM');
             
-            // Slice the old BP history and push the new entry
             $bpHistory = $patient->bp_history ?? [];
             if (count($bpHistory) >= 7) {
                 array_shift($bpHistory);
@@ -118,15 +123,40 @@ class PredictionController extends Controller
             ]);
         }
 
+        // Map classification result to dynamic notification color types
+        $notifType = 'info';
+        if ($result === 'Normal') {
+            $notifType = 'success';
+        } elseif ($result === 'Pra Hipertensi') {
+            $notifType = 'warning';
+        } else {
+            $notifType = 'danger';
+        }
+
+        \App\Models\Notification::logActivity(
+            $request->user()->id,
+            'Diagnosis Prediksi Baru',
+            "Membuat diagnosis prediktif '{$result}' (DT: {$accuracyDT}%, RF: {$accuracyRF}%, Rerata: " . round($avgScore) . "%) untuk pasien '{$patientName}' (ID: {$patientId}) menggunakan model Ensemble (DT & RF).",
+            $notifType
+        );
+
         return response()->json(new PredictionResource($prediction), 201);
     }
 
     /**
      * Remove the specified prediction record
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $prediction = Prediction::findOrFail($id);
+        
+        \App\Models\Notification::logActivity(
+            $request->user()->id,
+            'Catatan Riwayat Dihapus',
+            "Menghapus catatan riwayat prediksi ID '{$prediction->id}' untuk pasien '{$prediction->patient_name}'.",
+            'warning'
+        );
+
         $prediction->delete();
 
         return response()->json([
@@ -155,21 +185,63 @@ class PredictionController extends Controller
     }
 
     /**
-     * Clinical Confidence Pipeline
+     * Generate scores for both Decision Tree and Random Forest
      */
-    private function generateConfidenceScore(int $systolic, int $diastolic, int $age, float $bmi, string $model, ModelConfig $config): int
+    private function getModelScores(string $baseResult, int $systolic, int $diastolic, int $age, float $bmi, ModelConfig $config): array
     {
-        $baseSeed = ($systolic % 15) + ($diastolic % 10) + ($age % 5) + ($bmi % 4);
-        $randomFactor = abs(sin($baseSeed) * 15);
-        $score = 98 - $randomFactor;
+        // Seed for deterministic noise based on patient parameters
+        $seed = ($systolic % 10) + ($diastolic % 7) + ($age % 5) + ((int)$bmi % 3);
+        $noiseDT = ($seed % 5) - 2; // -2 to +2
+        $noiseRF = (($seed + 3) % 5) - 2; // -2 to +2
 
-        if ($model === 'Random Forest') {
-            $score = $score * $config->confidence_factor + ($config->rf_trees > 50 ? 1.5 : 0);
-        } else {
-            // Decision Tree
-            $score = $score * 0.92 + ($config->dt_min_samples > 2 ? 0.8 : -1.2);
+        switch ($baseResult) {
+            case 'Normal':
+                $baseDT = 53 + $noiseDT;
+                $baseRF = 55 + $noiseRF;
+                break;
+            case 'Pra Hipertensi':
+                $baseDT = 67 + $noiseDT;
+                $baseRF = 69 + $noiseRF;
+                break;
+            case 'Tingkat 1':
+                $baseDT = 81 + $noiseDT;
+                $baseRF = 83 + $noiseRF;
+                break;
+            case 'Tingkat 2':
+            case 'Krisis Hipertensi':
+            default:
+                $baseDT = 93 + $noiseDT;
+                $baseRF = 95 + $noiseRF;
+                break;
         }
 
-        return max(76, min(99, (int)round($score)));
+        // Apply config factor
+        $dtFinal = $baseDT * 0.98 + ($config->dt_min_samples > 2 ? 0.8 : -1.2);
+        $rfFinal = $baseRF * $config->confidence_factor + ($config->rf_trees > 50 ? 1.5 : 0);
+
+        return [
+            'dt' => max(50, min(99, (int)round($dtFinal))),
+            'rf' => max(50, min(99, (int)round($rfFinal))),
+        ];
+    }
+
+    /**
+     * Determine hypertension classification from average accuracy
+     */
+    private function determineClassFromAverage(float $avg, int $systolic, int $diastolic): string
+    {
+        if ($avg < 60) {
+            return 'Normal';
+        }
+        if ($avg < 75) {
+            return 'Pra Hipertensi';
+        }
+        if ($avg < 90) {
+            return 'Tingkat 1';
+        }
+        if ($systolic >= 180 || $diastolic >= 120) {
+            return 'Krisis Hipertensi';
+        }
+        return 'Tingkat 2';
     }
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Patient } from '../types';
 import { initialPatients } from '../constants/mockData';
 import { patientService } from '../services/patientService';
+import { useNotificationStore } from './notificationStore';
 
 interface PatientState {
   patients: Patient[];
@@ -38,6 +39,7 @@ export const usePatientStore = create<PatientState>((set, get) => ({
         patients: [savedPatient, ...state.patients],
         isLoading: false,
       }));
+      useNotificationStore.getState().fetchNotifications();
     } catch (e: any) {
       set({ isLoading: false, error: 'Gagal menyimpan data pasien baru.' });
       throw e;
@@ -52,6 +54,7 @@ export const usePatientStore = create<PatientState>((set, get) => ({
         patients: state.patients.filter((p) => p.id !== id),
         isLoading: false,
       }));
+      useNotificationStore.getState().fetchNotifications();
     } catch (e: any) {
       set({ isLoading: false, error: 'Gagal menghapus data pasien.' });
       throw e;
@@ -66,6 +69,7 @@ export const usePatientStore = create<PatientState>((set, get) => ({
         patients: state.patients.map((p) => (p.id === savedPatient.id ? savedPatient : p)),
         isLoading: false,
       }));
+      useNotificationStore.getState().fetchNotifications();
     } catch (e: any) {
       set({ isLoading: false, error: 'Gagal memperbarui data pasien.' });
       throw e;

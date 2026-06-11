@@ -29,6 +29,8 @@ class PredictionResource extends JsonResource
             'height' => (float)$this->height,
             'bmi' => (float)$this->bmi,
             'result' => $this->result,
+            'accuracyDT' => $this->accuracy_dt !== null ? (int)$this->accuracy_dt : null,
+            'accuracyRF' => $this->accuracy_rf !== null ? (int)$this->accuracy_rf : null,
         ];
     }
 }

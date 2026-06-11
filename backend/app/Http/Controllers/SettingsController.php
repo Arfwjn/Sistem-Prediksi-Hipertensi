@@ -77,6 +77,13 @@ class SettingsController extends Controller
 
         $config->save();
 
+        \App\Models\Notification::logActivity(
+            $request->user()->id,
+            'Parameter Model Diubah',
+            "Mengonfigurasi model klasifikasi aktif menjadi '{$config->active_model}' dengan parameter baru (Trees: {$config->rf_trees}, Depth: {$config->rf_max_depth}).",
+            'warning'
+        );
+
         return response()->json([
             'activeModel' => $config->active_model,
             'rfTrees' => (int)$config->rf_trees,
@@ -107,6 +114,13 @@ class SettingsController extends Controller
             'hospital' => $validated['hospital'] ?? 'Heart & Vascular Center',
             'avatar_url' => $validated['avatarUrl'] ?? $user->avatar_url,
         ]);
+
+        \App\Models\Notification::logActivity(
+            $user->id,
+            'Profil Dokter Diperbarui',
+            "Memperbarui data profil profesional Dr. '{$user->name}' (Spesialisasi: {$user->specialty}, Rumah Sakit: {$user->hospital}).",
+            'success'
+        );
 
         return new DoctorProfileResource($user);
     }

@@ -8,6 +8,7 @@ interface GlowCardProps {
   width?: string | number;
   height?: string | number;
   customSize?: boolean;
+  overflowVisible?: boolean;
 }
 
 export const GlowCard: React.FC<GlowCardProps> = ({
@@ -18,6 +19,7 @@ export const GlowCard: React.FC<GlowCardProps> = ({
   width,
   height,
   customSize = false,
+  overflowVisible = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -78,10 +80,10 @@ export const GlowCard: React.FC<GlowCardProps> = ({
     <div
       ref={containerRef}
       style={inlineStyles}
-      className={`group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_6px_35px_rgba(0,0,0,0.04)] p-6 transition-all duration-300 ${borderMap[glowColor]} ${sizeClass} ${className}`}
+      className={`group relative ${overflowVisible ? '' : 'overflow-hidden'} rounded-3xl border border-slate-200 bg-white shadow-[0_6px_35px_rgba(0,0,0,0.04)] p-6 transition-all duration-300 ${borderMap[glowColor]} ${sizeClass} ${className}`}
     >
       <div
-        className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"
         style={{
           background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), ${colorMap[glowColor]}, transparent 40%)`,
         }}

@@ -93,6 +93,7 @@ export default function BPTrendChart() {
       className="p-6 relative text-left"
       glowColor="blue"
       customSize={true}
+      overflowVisible={true}
     >
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -227,8 +228,8 @@ export default function BPTrendChart() {
               exit={{ opacity: 0, scale: 0.96 }}
               className="absolute p-3 bg-slate-900 border border-slate-800 text-white rounded-xl text-[11px] font-semibold shadow-xl z-20 flex flex-col gap-1 text-left select-none pointer-events-none"
               style={{
-                left: `${sysPoints[hoveredTrendIndex]?.x ?? 0}px`,
-                transform: hoveredTrendIndex >= months.length - 2 ? 'translateX(-115%)' : 'translateX(12px)',
+                left: `${((sysPoints[hoveredTrendIndex]?.x ?? 0) / 700) * 100}%`,
+                transform: hoveredTrendIndex === months.length - 1 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)',
                 top: '25px'
               }}
             >
