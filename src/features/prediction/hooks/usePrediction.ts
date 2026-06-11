@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { usePredictionStore } from '../../../stores/predictionStore';
+import { usePatientStore } from '../../../stores/patientStore';
+import { predictionService } from '../../../services/predictionService';
 import { classifyHypertension, HypertensionLevel } from '../../../utils/hypertension';
+import { Patient, PredictionRecord } from '../../../types';
 
 interface PredictionFormState {
   usia: number | '';
@@ -11,11 +14,19 @@ interface PredictionFormState {
   sistolik: number | '';
   diastolik: number | '';
   bmi: number;
+  
+  // Patient integration properties
+  patientType: 'registered' | 'new';
+  selectedPatientId: string | '';
+  patientName: string;
+  isSaved: boolean;
+
   currentResult: HypertensionLevel | null;
   currentConfidence: number | null;
   accuracyDT: number | null;
   accuracyRF: number | null;
   isClassifying: boolean;
+  
   setUsia: (val: number | '') => void;
   setGender: (val: 'L' | 'P') => void;
   setBerat: (val: number | '') => void;
@@ -23,6 +34,13 @@ interface PredictionFormState {
   setSistolik: (val: number | '') => void;
   setDiastolik: (val: number | '') => void;
   setBmi: (val: number) => void;
+  
+  // Setters for patient integration
+  setPatientType: (val: 'registered' | 'new') => void;
+  setSelectedPatientId: (val: string | '') => void;
+  setPatientName: (val: string) => void;
+  setIsSaved: (val: boolean) => void;
+
   setCurrentResult: (val: HypertensionLevel | null) => void;
   setCurrentConfidence: (val: number | null) => void;
   setAccuracyDT: (val: number | null) => void;
@@ -47,6 +65,12 @@ export const usePredictionFormStore = create<PredictionFormState>((set) => ({
   sistolik: '',
   diastolik: '',
   bmi: 0,
+  
+  patientType: 'registered',
+  selectedPatientId: '',
+  patientName: '',
+  isSaved: false,
+
   currentResult: null,
   currentConfidence: null,
   accuracyDT: null,
@@ -60,6 +84,12 @@ export const usePredictionFormStore = create<PredictionFormState>((set) => ({
   setSistolik: (sistolik) => set({ sistolik }),
   setDiastolik: (diastolik) => set({ diastolik }),
   setBmi: (bmi) => set({ bmi }),
+  
+  setPatientType: (patientType) => set({ patientType }),
+  setSelectedPatientId: (selectedPatientId) => set({ selectedPatientId }),
+  setPatientName: (patientName) => set({ patientName }),
+  setIsSaved: (isSaved) => set({ isSaved }),
+
   setCurrentResult: (currentResult) => set({ currentResult }),
   setCurrentConfidence: (currentConfidence) => set({ currentConfidence }),
   setAccuracyDT: (accuracyDT) => set({ accuracyDT }),
@@ -73,6 +103,10 @@ export const usePredictionFormStore = create<PredictionFormState>((set) => ({
     sistolik: '',
     diastolik: '',
     bmi: 0,
+    patientType: 'registered',
+    selectedPatientId: '',
+    patientName: '',
+    isSaved: false,
     currentResult: null,
     currentConfidence: null,
     accuracyDT: null,
@@ -85,7 +119,18 @@ export function usePrediction() {
   const { addRecord } = usePredictionStore();
 
   const handleClassify = async (): Promise<boolean> => {
-    const { usia, berat, tinggi, sistolik, diastolik } = store;
+    const { usia, berat, tinggi, sistolik, diastolik, patientType, selectedPatientId, patientName } = store;
+    
+    if (patientType === 'registered' && !selectedPatientId) {
+      alert('Mohon pilih pasien terdaftar terlebih dahulu.');
+      return false;
+    }
+    
+    if (patientType === 'new' && !patientName.trim()) {
+      alert('Mohon isi nama lengkap pasien baru.');
+      return false;
+    }
+
     if (!usia || !berat || !tinggi || !sistolik || !diastolik) {
       alert('Mohon isi semua data klinis pasien terlebih dahulu.');
       return false;
@@ -94,19 +139,46 @@ export function usePrediction() {
     store.setIsClassifying(true);
 
     try {
-      const savedRecord = await addRecord({
-        usia: Number(usia),
-        gender: store.gender,
-        berat: Number(berat),
-        tinggi: Number(tinggi),
-        sistolik: Number(sistolik),
-        diastolik: Number(diastolik),
-      });
+      if (patientType === 'registered') {
+        const matchingPatient = usePatientStore.getState().patients.find(p => p.id === selectedPatientId);
+        const nameToUse = matchingPatient ? matchingPatient.name : 'Pasien Terdaftar';
 
-      store.setCurrentResult(savedRecord.result as HypertensionLevel);
-      store.setCurrentConfidence(savedRecord.confidenceScore);
-      store.setAccuracyDT(savedRecord.accuracyDT || null);
-      store.setAccuracyRF(savedRecord.accuracyRF || null);
+        const savedRecord = await addRecord({
+          usia: Number(usia),
+          gender: store.gender,
+          berat: Number(berat),
+          tinggi: Number(tinggi),
+          sistolik: Number(sistolik),
+          diastolik: Number(diastolik),
+          patientId: selectedPatientId,
+          patientName: nameToUse,
+          save: true
+        });
+
+        store.setCurrentResult(savedRecord.result as HypertensionLevel);
+        store.setCurrentConfidence(savedRecord.confidenceScore);
+        store.setAccuracyDT(savedRecord.accuracyDT || null);
+        store.setAccuracyRF(savedRecord.accuracyRF || null);
+        store.setIsSaved(true);
+      } else {
+        // For unregistered patients, call classify service directly with save: false
+        const computedResult = await predictionService.classify({
+          usia: Number(usia),
+          gender: store.gender,
+          berat: Number(berat),
+          tinggi: Number(tinggi),
+          sistolik: Number(sistolik),
+          diastolik: Number(diastolik),
+          patientName: patientName,
+          save: false
+        });
+
+        store.setCurrentResult(computedResult.result as HypertensionLevel);
+        store.setCurrentConfidence(computedResult.confidenceScore);
+        store.setAccuracyDT(computedResult.accuracyDT || null);
+        store.setAccuracyRF(computedResult.accuracyRF || null);
+        store.setIsSaved(false);
+      }
       return true;
     } catch (e) {
       console.warn('Backend server offline / gagal diakses. Menjalankan simulasi prediksi lokal...');
@@ -137,7 +209,6 @@ export function usePrediction() {
           baseRF = 83 + noiseRF;
           break;
         case 'Tingkat 2':
-        case 'Krisis Hipertensi':
         default:
           baseDT = 93 + noiseDT;
           baseRF = 95 + noiseRF;
@@ -160,14 +231,100 @@ export function usePrediction() {
       } else if (finalConfidence < 90) {
         finalResult = 'Tingkat 1';
       } else {
-        finalResult = localResult === 'Krisis Hipertensi' ? 'Krisis Hipertensi' : 'Tingkat 2';
+        finalResult = localResult;
       }
 
       store.setCurrentResult(finalResult);
       store.setCurrentConfidence(finalConfidence);
       store.setAccuracyDT(simulatedDT);
       store.setAccuracyRF(simulatedRF);
+      
+      if (patientType === 'registered') {
+        // Sync local offline state for registered patients
+        usePatientStore.getState().updatePatientStatus(selectedPatientId, patientName, finalResult, Number(sistolik), Number(diastolik));
+        
+        // Add to local prediction store records so it appears in Riwayat Pasien menu
+        const generatedId = 'PAS-OFF-' + String(Math.floor(Math.random() * 900 + 100));
+        const heightInMeters = Number(tinggi) / 100;
+        const bmi = Math.round((Number(berat) / (heightInMeters * heightInMeters)) * 10) / 10;
+        
+        const simulatedRecord: PredictionRecord = {
+          id: generatedId,
+          patientId: selectedPatientId,
+          patientName: patientName,
+          date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+          modelUsed: 'Decision Tree & Random Forest',
+          confidenceScore: finalConfidence,
+          accuracyDT: simulatedDT,
+          accuracyRF: simulatedRF,
+          systolic: Number(sistolik),
+          diastolic: Number(diastolik),
+          age: Number(usia),
+          gender: store.gender,
+          weight: Number(berat),
+          height: Number(tinggi),
+          bmi: bmi,
+          result: finalResult,
+        };
+        
+        usePredictionStore.setState((state) => ({
+          records: [simulatedRecord, ...state.records]
+        }));
+        
+        store.setIsSaved(true);
+      } else {
+        store.setIsSaved(false);
+      }
+      
       return true;
+    } finally {
+      store.setIsClassifying(false);
+    }
+  };
+
+  const handleSaveNewPatient = async (): Promise<boolean> => {
+    const { patientName, usia, gender, currentResult, berat, tinggi, sistolik, diastolik } = store;
+    if (!patientName || !usia || !gender || !currentResult) {
+      alert('Data tidak lengkap untuk menyimpan pasien.');
+      return false;
+    }
+    
+    store.setIsClassifying(true);
+    try {
+      const { addPatient } = usePatientStore.getState();
+      
+      // 1. Save patient to patient list registry
+      const savedPatient = await addPatient({
+        name: patientName,
+        age: Number(usia),
+        gender: gender,
+        phone: '',
+        email: '',
+        address: '',
+        status: currentResult as any,
+      });
+
+      // 2. Save prediction record to database history
+      await addRecord({
+        usia: Number(usia),
+        gender: gender,
+        berat: Number(berat),
+        tinggi: Number(tinggi),
+        sistolik: Number(sistolik),
+        diastolik: Number(diastolik),
+        patientId: savedPatient.id,
+        patientName: savedPatient.name,
+        save: true,
+      });
+
+      store.setIsSaved(true);
+      store.setSelectedPatientId(savedPatient.id);
+      store.setPatientType('registered'); // Switch to registered since they are now saved
+      return true;
+    } catch (error) {
+      console.error('Gagal menyimpan data pasien baru:', error);
+      alert('Gagal mendaftarkan pasien ke database.');
+      return false;
     } finally {
       store.setIsClassifying(false);
     }
@@ -192,12 +349,23 @@ export function usePrediction() {
     diastolik: store.diastolik,
     setDiastolik: store.setDiastolik,
     bmi: store.bmi,
+    
+    patientType: store.patientType,
+    selectedPatientId: store.selectedPatientId,
+    patientName: store.patientName,
+    isSaved: store.isSaved,
+    setPatientType: store.setPatientType,
+    setSelectedPatientId: store.setSelectedPatientId,
+    setPatientName: store.setPatientName,
+    setIsSaved: store.setIsSaved,
+
     currentResult: store.currentResult,
     currentConfidence: store.currentConfidence,
     accuracyDT: store.accuracyDT,
     accuracyRF: store.accuracyRF,
     isClassifying: store.isClassifying,
     handleClassify,
+    handleSaveNewPatient,
     handleReset: store.resetForm,
   };
 }

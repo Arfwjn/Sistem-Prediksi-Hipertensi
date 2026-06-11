@@ -23,12 +23,6 @@ export const HYPERTENSION_COLORS = {
     primary: '#ef4444', // rose-500 or red-500
     primaryLight: 'rgba(239, 68, 68, 0.1)',
   },
-  'Krisis Hipertensi': {
-    bg: 'bg-red-100 text-red-800 border-red-300 animate-pulse',
-    text: 'text-red-800 font-bold',
-    primary: '#b91c1c', // red-700
-    primaryLight: 'rgba(185, 28, 28, 0.2)',
-  },
 } as const;
 
 export type HypertensionLevel = keyof typeof HYPERTENSION_COLORS;

@@ -11,7 +11,6 @@ const STATUS_CONFIG = [
   { label: 'Pra Hipertensi', color: '#f59e0b', svgColor: '#f59e0b' },
   { label: 'Tingkat 1', color: '#bc4800', svgColor: '#e11d48' },
   { label: 'Tingkat 2', color: '#ba1a1a', svgColor: '#be123c' },
-  { label: 'Krisis Hipertensi', color: '#7f1d1d', svgColor: '#991b1b' },
 ] as const;
 
 export default function DiagnosisDonut() {

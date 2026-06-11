@@ -10,6 +10,7 @@ export interface ClassifyPayload {
   diastolik: number;
   patientId?: string;
   patientName?: string;
+  save?: boolean;
 }
 
 export const predictionService = {

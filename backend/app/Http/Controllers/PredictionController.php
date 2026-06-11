@@ -33,6 +33,7 @@ class PredictionController extends Controller
             'diastolik' => 'required|integer|min:1',
             'patientId' => 'nullable|string',
             'patientName' => 'nullable|string',
+            'save' => 'nullable|boolean',
         ]);
 
         $usia = $validated['usia'];
@@ -41,6 +42,7 @@ class PredictionController extends Controller
         $tinggi = $validated['tinggi'];
         $sistolik = $validated['sistolik'];
         $diastolik = $validated['diastolik'];
+        $shouldSave = $validated['save'] ?? true;
         
         // 1. Calculate BMI
         $heightInMeters = $tinggi / 100;
@@ -53,7 +55,7 @@ class PredictionController extends Controller
         $config = ModelConfig::first();
         if (!$config) {
             $config = ModelConfig::create([
-                'active_model' => 'Ensemble (DT & RF)',
+                'active_model' => 'Decision Tree & Random Forest',
                 'rf_trees' => 100,
                 'rf_max_depth' => 12,
                 'dt_min_samples' => 4,
@@ -78,13 +80,12 @@ class PredictionController extends Controller
         $patientId = $validated['patientId'] ?? ('PT-2023-' . rand(100, 999));
         $patientName = $validated['patientName'] ?? 'Pasien Rawat Jalan';
 
-        // 7. Save prediction record
-        $prediction = Prediction::create([
+        $predictionData = [
             'id' => $generatedId,
             'patient_id' => $patientId,
             'patient_name' => $patientName,
             'date' => now()->locale('id-ID')->isoFormat('DD MMM YYYY, HH:mm') . ' WIB',
-            'model_used' => 'Ensemble (DT & RF)',
+            'model_used' => 'Decision Tree & Random Forest',
             'confidence_score' => (int)round($avgScore),
             'accuracy_dt' => $accuracyDT,
             'accuracy_rf' => $accuracyRF,
@@ -96,7 +97,15 @@ class PredictionController extends Controller
             'height' => $tinggi,
             'bmi' => $bmi,
             'result' => $result,
-        ]);
+        ];
+
+        if (!$shouldSave) {
+            $prediction = new Prediction($predictionData);
+            return response()->json(new PredictionResource($prediction), 200);
+        }
+
+        // 7. Save prediction record
+        $prediction = Prediction::create($predictionData);
 
         // 8. Auto-update matched patient status and BP history registry if exists!
         $patient = Patient::where('id', $patientId)
@@ -136,7 +145,7 @@ class PredictionController extends Controller
         \App\Models\Notification::logActivity(
             $request->user()->id,
             'Diagnosis Prediksi Baru',
-            "Membuat diagnosis prediktif '{$result}' (DT: {$accuracyDT}%, RF: {$accuracyRF}%, Rerata: " . round($avgScore) . "%) untuk pasien '{$patientName}' (ID: {$patientId}) menggunakan model Ensemble (DT & RF).",
+            "Membuat diagnosis prediktif '{$result}' (DT: {$accuracyDT}%, RF: {$accuracyRF}%, Rerata: " . round($avgScore) . "%) untuk pasien '{$patientName}' (ID: {$patientId}) menggunakan model Decision Tree & Random Forest.",
             $notifType
         );
 
@@ -169,9 +178,6 @@ class PredictionController extends Controller
      */
     private function classifyHypertension(int $systolic, int $diastolic): string
     {
-        if ($systolic >= 180 || $diastolic >= 120) {
-            return 'Krisis Hipertensi';
-        }
         if ($systolic >= 160 || $diastolic >= 100) {
             return 'Tingkat 2';
         }
@@ -208,7 +214,6 @@ class PredictionController extends Controller
                 $baseRF = 83 + $noiseRF;
                 break;
             case 'Tingkat 2':
-            case 'Krisis Hipertensi':
             default:
                 $baseDT = 93 + $noiseDT;
                 $baseRF = 95 + $noiseRF;
@@ -238,9 +243,6 @@ class PredictionController extends Controller
         }
         if ($avg < 90) {
             return 'Tingkat 1';
-        }
-        if ($systolic >= 180 || $diastolic >= 120) {
-            return 'Krisis Hipertensi';
         }
         return 'Tingkat 2';
     }

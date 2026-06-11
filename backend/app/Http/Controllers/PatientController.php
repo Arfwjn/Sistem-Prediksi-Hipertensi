@@ -58,9 +58,9 @@ class PatientController extends Controller
             'name' => $validated['name'],
             'age' => $validated['age'],
             'gender' => $validated['gender'],
-            'phone' => $validated['phone'] ?? '0812-0000-0000',
-            'email' => $validated['email'] ?? 'pasien@gmail.com',
-            'address' => $validated['address'] ?? 'Jl. Raya Kebon Jeruk No. 5',
+            'phone' => $validated['phone'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'address' => $validated['address'] ?? null,
             'status' => $validated['status'],
             'last_checked' => now()->toDateString(),
             'bp_history' => $mockBPHistory

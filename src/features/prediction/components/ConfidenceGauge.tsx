@@ -18,7 +18,6 @@ export default function ConfidenceGauge({ confidence, result }: ConfidenceGaugeP
       case 'Tingkat 1':
         return '#f97316'; // orange-500
       case 'Tingkat 2':
-      case 'Krisis Hipertensi':
         return '#dc2626'; // red-600
       default:
         return '#3b82f6'; // blue-500

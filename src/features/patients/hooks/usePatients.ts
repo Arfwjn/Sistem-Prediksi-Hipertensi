@@ -37,9 +37,9 @@ export function usePatients() {
       name: newName,
       age: Number(newAge),
       gender: newGender,
-      phone: newPhone || '0812-0000-0000',
-      email: newEmail || 'pasien@gmail.com',
-      address: newAddress || 'Jl. Raya Kebon Jeruk No. 5',
+      phone: newPhone || '',
+      email: newEmail || '',
+      address: newAddress || '',
       status: newStatus,
     });
     setIsAddOpen(false);

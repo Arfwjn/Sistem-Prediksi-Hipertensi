@@ -69,7 +69,7 @@ export const initialPatients: Patient[] = [
     phone: '0813-8877-6655',
     email: 'rina.wati@prohealth.org',
     address: 'Komp. Hijau Permai C-12, Tangerang',
-    status: 'Krisis Hipertensi',
+    status: 'Tingkat 2',
     lastChecked: '2023-10-01',
     bpHistory: [
       { date: 'Jan', systolic: 145, diastolic: 92 },
@@ -228,14 +228,14 @@ export const initialRecords: PredictionRecord[] = [
 ];
 
 export const defaultDoctor: DoctorProfile = {
-  name: 'Dr. Arief Sidik',
-  specialty: 'Cardiologist',
+  name: 'Admin',
+  specialty: 'Puskesmas Kembaran 1',
   hospital: 'Heart & Vascular Center',
   avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB8_hal2uMpHdU0fXwbdxj_RouEx1tog0fjGfLNIW4jBu7E8jEcL6b10UtoPEsljh96omp-ChkPkRB-kPZ5FBxv2Zb2UQG6iy5iZ2Vm_twy7t5Fxq-WkFsoN0zpDYW12aKJEYpW7Juk42DAAEyahBD2PUUYYgsq2V-M1aKGEh1SM3oRTeqh3dImYwISeDlMcdnrDIwaAVvLyIYZWUuzukDC6xUg_DSRf75EMN9prQ-rWXAP4AhCWdkPKCP4_nCPoqt9boI5AqR7ADY'
 };
 
 export const defaultModelConfig: AIModelConfig = {
-  activeModel: 'Random Forest',
+  activeModel: 'Decision Tree & Random Forest',
   rfTrees: 100,
   rfMaxDepth: 12,
   dtMinSamples: 4,

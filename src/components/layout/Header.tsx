@@ -51,6 +51,7 @@ export default function Header() {
     if (path.startsWith('/sistem-klasifikasi')) return 'Sistem Klasifikasi Tingkat Hipertensi';
     if (path.startsWith('/history')) return 'Riwayat Prediksi Klasifikasi';
     if (path.startsWith('/patients')) return 'Manajemen Data Pasien';
+    if (path.startsWith('/evaluasi')) return 'Hasil Evaluasi Model AI';
     if (path.startsWith('/settings')) return 'Pengaturan Algoritma AI';
     return 'Clinical Intelligence System';
   };
@@ -185,10 +186,10 @@ export default function Header() {
             className="flex items-center gap-3 p-1.5 pr-4 border border-slate-200 hover:border-blue-150 bg-slate-50/40 hover:bg-blue-50/20 rounded-2xl cursor-pointer transition-all active:scale-98 relative"
           >
             <img
-              alt="Doctor Avatar"
+              alt="Logo Dinas Kesehatan"
               referrerPolicy="no-referrer"
-              className="w-9 h-9 rounded-xl border border-blue-100 object-cover bg-white pointer-events-none"
-              src={doctor.avatarUrl}
+              className="w-9 h-9 rounded-xl border border-blue-100 object-contain bg-white pointer-events-none p-0.5"
+              src="/logo_dinkes.png"
             />
             <div className="hidden md:block text-left">
               <p className="text-[12.5px] font-bold text-slate-800 leading-tight tracking-tight">{doctor.name}</p>
@@ -209,10 +210,10 @@ export default function Header() {
                 >
                   <div className="flex gap-3 pb-3 border-b border-slate-100 select-none">
                     <img
-                      alt="Doctor Avatar dropdown"
+                      alt="Logo Dinas Kesehatan"
                       referrerPolicy="no-referrer"
-                      className="w-11 h-11 rounded-xl object-cover bg-slate-100 border border-slate-200"
-                      src={doctor.avatarUrl}
+                      className="w-11 h-11 rounded-xl object-contain bg-white border border-slate-200 p-0.5"
+                      src="/logo_dinkes.png"
                     />
                     <div>
                       <h3 className="text-xs font-bold text-slate-800 leading-snug">{doctor.name}</h3>

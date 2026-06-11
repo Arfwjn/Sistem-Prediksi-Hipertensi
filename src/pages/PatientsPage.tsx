@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, UserPlus, SlidersHorizontal, SortAsc, Trash2, Eye, X, Phone, Mail, MapPin, Calendar } from 'lucide-react';
+import { Search, UserPlus, SlidersHorizontal, SortAsc, Trash2, Eye, X, Phone, Mail, MapPin, Calendar, HeartPulse } from 'lucide-react';
 import { usePatients } from '../features/patients/hooks/usePatients';
 import { Patient } from '../types';
 import { Badge } from '../components/ui/Badge';
@@ -11,6 +12,7 @@ import { Button } from '../components/ui/Button';
 import { formatDate } from '../utils/format';
 
 export default function PatientsPage() {
+  const navigate = useNavigate();
   const {
     filterText,
     setFilterText,
@@ -37,6 +39,10 @@ export default function PatientsPage() {
     handleCreatePatient,
     handleDeletePatient,
   } = usePatients();
+
+  const handleShortcutPredict = (patient: Patient) => {
+    navigate('/sistem-klasifikasi', { state: { patient } });
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-4 select-none">
@@ -133,6 +139,13 @@ export default function PatientsPage() {
                       {/* Interactive hover actions row slider */}
                       <td className="py-4.5 px-6 text-right select-none">
                         <div className="flex justify-end gap-1 px-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                          <button
+                            onClick={() => handleShortcutPredict(pat)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all cursor-pointer"
+                            title="Mulai Klasifikasi Hipertensi"
+                          >
+                            <HeartPulse className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => setSelectedPatient(pat)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-blue-650 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all cursor-pointer"
@@ -361,7 +374,6 @@ export default function PatientsPage() {
               { value: 'Pra Hipertensi', label: 'Pra Hipertensi' },
               { value: 'Tingkat 1', label: 'Hipertensi Tingkat 1' },
               { value: 'Tingkat 2', label: 'Hipertensi Tingkat 2' },
-              { value: 'Krisis Hipertensi', label: 'Krisis Hipertensi' },
             ]}
           />
 

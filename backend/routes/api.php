@@ -12,8 +12,11 @@ use App\Http\Controllers\SettingsController;
 |--------------------------------------------------------------------------
 */
 
-// Public Authentication Endpoint
+// Public Authentication Endpoints
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Secure Session-Guarded Endpoints (Sanctum Tokens)
 Route::middleware('auth:sanctum')->group(function () {

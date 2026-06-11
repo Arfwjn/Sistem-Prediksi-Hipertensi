@@ -140,7 +140,7 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(({
   const getVariantClasses = (v: 'default' | 'subtle' | 'error', t: 'light' | 'dark' | 'neutral') => {
     const variants = {
       default: {
-        light: "bg-white border-dashed border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50/50",
+        light: "bg-white border border-solid border-slate-200 hover:border-slate-200 hover:bg-white",
         dark: "bg-neutral-900 border-dashed border-2 border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800/50",
         neutral: "bg-stone-50 border-dashed border-2 border-stone-300 hover:border-stone-400 hover:bg-stone-100/50"
       },

@@ -109,80 +109,59 @@ export default function SettingsPage() {
           </h3>
 
           <form onSubmit={handleSaveModel} className="space-y-5 pt-4">
-            {/* Active Model */}
-            <Select
-              label="Metodologi Utama Classifier"
-              value={activeModel}
-              onChange={(e) => setActiveModel(e.target.value as any)}
-              options={[
-                { value: 'Random Forest', label: 'Random Forest (Sangat Akurat)' },
-                { value: 'Decision Tree', label: 'Decision Tree (Sedang)' },
-              ]}
-            />
-
-            {/* Random forest sliders */}
-            {activeModel === 'Random Forest' && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-4 border-l-2 border-blue-500 pl-4 py-1"
-              >
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center text-xs text-slate-655 font-bold">
-                    <span>Jumlah Estimator Pohon (Trees)</span>
-                    <span className="text-blue-600">{rfTrees}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="50"
-                    max="250"
-                    step="10"
-                    value={rfTrees}
-                    onChange={(e) => setRfTrees(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-blue-600 focus:outline-none"
-                  />
+            {/* Random Forest Parameters */}
+            <div className="space-y-4 border-l-2 border-blue-500 pl-4 py-1">
+              <span className="text-[10px] font-black text-blue-600 block uppercase tracking-wider select-none">Parameter Random Forest (RF)</span>
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-xs text-slate-600 font-bold">
+                  <span>Jumlah Estimator Pohon (Trees)</span>
+                  <span className="text-blue-605">{rfTrees}</span>
                 </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="250"
+                  step="10"
+                  value={rfTrees}
+                  onChange={(e) => setRfTrees(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                />
+              </div>
 
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center text-xs text-slate-655 font-bold">
-                    <span>Kedalaman Maksimal Cabang (Depth)</span>
-                    <span className="text-blue-600">{rfMaxDepth}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="4"
-                    max="20"
-                    value={rfMaxDepth}
-                    onChange={(e) => setRfMaxDepth(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-blue-600 focus:outline-none"
-                  />
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-xs text-slate-600 font-bold">
+                  <span>Kedalaman Maksimal Cabang (Depth)</span>
+                  <span className="text-blue-605">{rfMaxDepth}</span>
                 </div>
-              </motion.div>
-            )}
+                <input
+                  type="range"
+                  min="4"
+                  max="20"
+                  value={rfMaxDepth}
+                  onChange={(e) => setRfMaxDepth(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                />
+              </div>
+            </div>
 
-            {/* Decision tree sliders */}
-            {activeModel === 'Decision Tree' && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-4 border-l-2 border-emerald-500 pl-4 py-1"
-              >
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center text-xs text-slate-655 font-bold">
-                    <span>Min Samples Split</span>
-                    <span className="text-emerald-700">{dtMinSamples}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="2"
-                    max="10"
-                    value={dtMinSamples}
-                    onChange={(e) => setDtMinSamples(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
-                  />
+            {/* Decision Tree Parameters */}
+            <div className="space-y-4 border-l-2 border-emerald-500 pl-4 py-1">
+              <span className="text-[10px] font-black text-emerald-600 block uppercase tracking-wider select-none">Parameter Decision Tree (DT)</span>
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-xs text-slate-600 font-bold">
+                  <span>Min Samples Split</span>
+                  <span className="text-emerald-700">{dtMinSamples}</span>
                 </div>
-              </motion.div>
-            )}
+                <input
+                  type="range"
+                  min="2"
+                  max="10"
+                  value={dtMinSamples}
+                  onChange={(e) => setDtMinSamples(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+                />
+              </div>
+            </div>
 
             {/* Precision factor adjustment slider */}
             <div className="space-y-1 pt-2">

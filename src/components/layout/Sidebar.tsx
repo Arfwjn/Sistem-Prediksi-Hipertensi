@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, History, Users, Settings, LogOut, Heart, X, BrainCircuit } from 'lucide-react';
+import { LayoutDashboard, History, Users, Settings, LogOut, X, BrainCircuit, BarChart3 } from 'lucide-react';
 import { useUIStore } from '../../stores/uiStore';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -35,6 +35,12 @@ export default function Sidebar() {
       label: 'Data Pasien',
       icon: Users,
       description: 'Daftar pasien & detail medis'
+    },
+    {
+      path: '/evaluasi',
+      label: 'Hasil Evaluasi',
+      icon: BarChart3,
+      description: 'Perbandingan performa model AI'
     }
   ];
 
@@ -49,8 +55,8 @@ export default function Sidebar() {
     <div className="h-full flex flex-col py-6 bg-white border-r border-slate-200/85 shadow-sm">
       {/* Brand Header */}
       <div className="flex items-center gap-3 px-6 mb-10 select-none">
-        <div className="w-10 h-10 rounded-xl bg-blue-50/70 flex items-center justify-center border border-blue-100/50">
-          <Heart className="text-[#0053db] fill-[#0053db]/10 w-5.5 h-5.5 animate-pulse" />
+        <div className="w-10 h-10 rounded-xl bg-blue-50/70 flex items-center justify-center border border-blue-100/50 overflow-hidden">
+          <img src="/logo_banyumas.png" alt="Logo Puskesmas" className="w-8 h-8 object-contain" />
         </div>
         <div>
           <h1 className="text-lg font-bold text-slate-950 tracking-tight leading-none">Sistem Klasifikasi</h1>

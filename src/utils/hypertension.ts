@@ -1,9 +1,6 @@
-export type HypertensionLevel = 'Normal' | 'Pra Hipertensi' | 'Tingkat 1' | 'Tingkat 2' | 'Krisis Hipertensi';
+export type HypertensionLevel = 'Normal' | 'Pra Hipertensi' | 'Tingkat 1' | 'Tingkat 2';
 
 export function classifyHypertension(systolic: number, diastolic: number): HypertensionLevel {
-  if (systolic >= 180 || diastolic >= 120) {
-    return 'Krisis Hipertensi';
-  }
   if (systolic >= 160 || diastolic >= 100) {
     return 'Tingkat 2';
   }
@@ -38,15 +35,9 @@ export function getHypertensionStageDetails(level: HypertensionLevel) {
       };
     case 'Tingkat 2':
       return {
-        range: 'Sistolik 160-179 atau Diastolik >= 100 mmHg',
+        range: 'Sistolik >= 160 atau Diastolik >= 100 mmHg',
         description: 'Kondisi tekanan darah tinggi yang signifikan. Biasanya memerlukan terapi kombinasi obat antihipertensi dari dokter pendamping.',
         recommendation: 'Konsultasi medis aktif ke dokter spesialis/Puskesmas, kepatuhan terapi obat secara presisi, hindari aktivitas fisik ekstrem.'
-      };
-    case 'Krisis Hipertensi':
-      return {
-        range: 'Sistolik >= 180 atau Diastolik >= 120 mmHg',
-        description: 'Darurat Medis Kritis! Tekanan darah sangat tinggi dan berisiko merusak organ vital (otak, jantung, ginjal) jika tidak ditangani segera.',
-        recommendation: 'SEGERA ke IGD rumah sakit terdekat atau hubungi ambulans darurat! Jangan tunda pemberian pertolongan medis pertama.'
       };
   }
 }

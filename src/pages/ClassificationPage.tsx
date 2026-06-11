@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ClinicalForm from '../features/prediction/components/ClinicalForm';
 import PredictionResult from '../features/prediction/components/PredictionResult';
 import { usePrediction } from '../features/prediction/hooks/usePrediction';
@@ -18,14 +19,40 @@ export default function ClassificationPage() {
     diastolik,
     setDiastolik,
     bmi,
+    
+    patientType,
+    selectedPatientId,
+    patientName,
+    isSaved,
+    setPatientType,
+    setSelectedPatientId,
+    setPatientName,
+    setIsSaved,
+
     currentResult,
     currentConfidence,
     accuracyDT,
     accuracyRF,
     isClassifying,
     handleClassify,
+    handleSaveNewPatient,
     handleReset,
   } = usePrediction();
+
+  const location = useLocation();
+  const importedPatient = location.state?.patient;
+
+  useEffect(() => {
+    if (importedPatient) {
+      setPatientType('registered');
+      setSelectedPatientId(importedPatient.id);
+      setPatientName(importedPatient.name);
+      setUsia(importedPatient.age);
+      setGender(importedPatient.gender);
+      // Clean router state to avoid repeating on page reload
+      window.history.replaceState({}, document.title);
+    }
+  }, [importedPatient, setPatientType, setSelectedPatientId, setPatientName, setUsia, setGender]);
 
   return (
     <div className="max-w-7xl mx-auto animate-fadeIn select-none">
@@ -49,6 +76,13 @@ export default function ClassificationPage() {
             isClassifying={isClassifying}
             onClassify={handleClassify}
             onReset={handleReset}
+            
+            patientType={patientType}
+            selectedPatientId={selectedPatientId}
+            patientName={patientName}
+            setPatientType={setPatientType}
+            setSelectedPatientId={setSelectedPatientId}
+            setPatientName={setPatientName}
           />
         </div>
 
@@ -59,6 +93,11 @@ export default function ClassificationPage() {
             confidence={currentConfidence}
             accuracyDT={accuracyDT}
             accuracyRF={accuracyRF}
+            patientType={patientType}
+            patientName={patientName}
+            isSaved={isSaved}
+            onSavePatient={handleSaveNewPatient}
+            isSaving={isClassifying}
           />
         </div>
       </section>

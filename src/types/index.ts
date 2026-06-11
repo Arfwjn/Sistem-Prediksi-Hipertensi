@@ -12,7 +12,7 @@ export interface Patient {
   phone: string;
   email: string;
   address: string;
-  status: 'Normal' | 'Pra Hipertensi' | 'Tingkat 1' | 'Tingkat 2' | 'Krisis Hipertensi';
+  status: 'Normal' | 'Pra Hipertensi' | 'Tingkat 1' | 'Tingkat 2';
   lastChecked: string;
   bpHistory: BPHistoryEntry[];
 }
@@ -33,7 +33,7 @@ export interface PredictionRecord {
   weight: number;
   height: number;
   bmi: number;
-  result: 'Normal' | 'Pra Hipertensi' | 'Tingkat 1' | 'Tingkat 2' | 'Krisis Hipertensi';
+  result: 'Normal' | 'Pra Hipertensi' | 'Tingkat 1' | 'Tingkat 2';
 }
 
 export type ActiveTab = 'dashboard' | 'history' | 'patients' | 'settings';
@@ -46,7 +46,7 @@ export interface DoctorProfile {
 }
 
 export interface AIModelConfig {
-  activeModel: 'Random Forest' | 'Decision Tree';
+  activeModel: 'Random Forest' | 'Decision Tree' | 'Decision Tree & Random Forest';
   rfTrees: number;
   rfMaxDepth: number;
   dtMinSamples: number;
