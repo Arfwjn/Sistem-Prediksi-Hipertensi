@@ -1,7 +1,21 @@
 # -*- coding: utf-8 -*-
 """
 Inference Engine: Model Machine Learning Hipertensi (Skenario 1 - Clinical Staging)
-Studi Kasus: Puskesmas Kembaran 1
+Studi Kasus: Puskesmas Kembaran 1, Kabupaten Banyumas
+
+Deskripsi Alur:
+1. Menerima data klinis pasien: Usia, Jenis Kelamin, Berat Badan, Tinggi Badan, Sistolik, Diastolik.
+2. Feature Engineering:
+   - Hitung IMT (Indeks Massa Tubuh) = BB (kg) / (TB (m))^2
+   - Encode Jenis Kelamin: Laki-laki = 1, Perempuan = 0
+   - Encode Kategori Usia (Kemenkes): Remaja = 0, Dewasa = 1, Lansia = 2, Manula = 3
+3. Normalisasi Fitur: Menggunakan StandardScaler (`scaler_hipertensi.pkl`) yang dilatih pada dataset skripsi.
+4. Inferensi Model:
+   - Model Decision Tree (`model_decision_tree_clinical.pkl`)
+   - Model Random Forest (`model_random_forest_clinical.pkl`)
+5. Ensemble Soft-Voting (60% RF, 40% DT) untuk menentukan kelas hipertensi dan skor keyakinan.
+6. Evaluasi Tekanan Nadi (Pulse Pressure = Sistolik - Diastolik) untuk deteksi kekakuan vaskular (≥ 60 mmHg).
+7. Mengembalikan output dalam format JSON standar ke stdout.
 """
 
 import sys
@@ -16,11 +30,12 @@ import pandas as pd
 
 def resolve_kategori_usia(age: int) -> int:
     """
-    Sesuai pemetaan dataset:
-    Remaja (12-18) = 0
-    Dewasa (19-59) = 1
-    Lansia (60-74) = 2
-    Manula (>=75)  = 3
+    Mengonversi umur numerik menjadi kode kategori usia ordinal
+    sesuai standar klasifikasi Departemen Kesehatan RI pada dataset skripsi:
+    - Remaja (12-18 tahun) = 0
+    - Dewasa (19-59 tahun) = 1
+    - Lansia (60-74 tahun) = 2
+    - Manula (>=75 tahun)  = 3
     """
     if age <= 18:
         return 0
@@ -32,6 +47,11 @@ def resolve_kategori_usia(age: int) -> int:
         return 3
 
 def resolve_jk_code(gender: str) -> int:
+    """
+    Mengonversi nilai jenis kelamin menjadi kode biner:
+    - 1: Laki-laki / Pria (L)
+    - 0: Perempuan / Wanita (P)
+    """
     g = str(gender).strip().upper()
     if g in ['L', 'LAKI-LAKI', 'PRIA', 'MALE', '1']:
         return 1
@@ -40,10 +60,16 @@ def resolve_jk_code(gender: str) -> int:
 _CACHED_MODELS = None
 
 def get_models():
+    """
+    Memuat objek StandardScaler, Decision Tree, Random Forest, serta metadata model
+    dari folder 'models/' secara dinamis menggunakan path relatif file ini.
+    Menerapkan singleton caching (_CACHED_MODELS) agar pemanggilan berulang tidak membaca ulang disk.
+    """
     global _CACHED_MODELS
     if _CACHED_MODELS is not None:
         return _CACHED_MODELS
 
+    # Tentukan path relatif dinamis terhadap lokasi direktori file predict.py
     base_dir = os.path.dirname(os.path.abspath(__file__))
     models_dir = os.path.join(base_dir, 'models')
 
@@ -52,6 +78,7 @@ def get_models():
     rf_path = os.path.join(models_dir, 'model_random_forest_clinical.pkl')
     meta_path = os.path.join(models_dir, 'model_metadata.json')
 
+    # Periksa ketersediaan seluruh file model wajib
     if not (os.path.exists(scaler_path) and os.path.exists(dt_path) and os.path.exists(rf_path)):
         return None
 
@@ -61,6 +88,7 @@ def get_models():
     dt_model = joblib.load(dt_path)
     rf_model = joblib.load(rf_path)
 
+    # Muat metrik akurasi dari metadata jika file metadata tersedia
     acc_dt = 100.0
     acc_rf = 99.97
     if os.path.exists(meta_path):
@@ -76,6 +104,15 @@ def get_models():
     return _CACHED_MODELS
 
 def predict(usia: int, gender: str, berat: float, tinggi: float, sistolik: int, diastolik: int):
+    """
+    Menjalankan proses inferensi lengkap untuk satu data pasien:
+    1. Feature Engineering (IMT, JK Code, Kategori Usia Code)
+    2. Susun dataframe 8 fitur
+    3. Standarisasi fitur dengan StandardScaler
+    4. Prediksi probabilitas kelas DT dan RF
+    5. Ensemble weighted average (60% RF + 40% DT)
+    6. Hitung pulse pressure & flag peringatan hemodinamik
+    """
     models = get_models()
     if models is None:
         return {
@@ -85,7 +122,7 @@ def predict(usia: int, gender: str, berat: float, tinggi: float, sistolik: int, 
 
     scaler, dt_model, rf_model, acc_dt, acc_rf = models
 
-    # 1. Feature Engineering
+    # 1. Feature Engineering sesuai metodologi skripsi
     jk_code = resolve_jk_code(gender)
     kategori_usia_code = resolve_kategori_usia(usia)
     
@@ -109,18 +146,19 @@ def predict(usia: int, gender: str, berat: float, tinggi: float, sistolik: int, 
         float(diastolik)
     ]], columns=feature_cols)
 
-    # 3. Normalisasi StandardScaler
+    # 3. Normalisasi Fitur menggunakan StandardScaler terlatih
     scaled_vector = scaler.transform(df_feat)
     scaled_df = pd.DataFrame(scaled_vector, columns=feature_cols)
 
-    # 4. Prediksi & Probabilitas Model
+    # 4. Prediksi & Probabilitas Model Individual
     pred_dt_idx = int(dt_model.predict(scaled_df)[0])
     proba_dt = dt_model.predict_proba(scaled_df)[0]
 
     pred_rf_idx = int(rf_model.predict(scaled_df)[0])
     proba_rf = rf_model.predict_proba(scaled_df)[0]
 
-    # Target Mapping: 0: Normal, 1: Pra Hipertensi, 2: Tingkat 1, 3: Tingkat 2
+    # Target Mapping Sesuai Standar JNC 7 & Kode Dataset Skripsi
+    # 0: Normal, 1: Pra Hipertensi, 2: Tingkat 1 (Hipertensi 1), 3: Tingkat 2 (Hipertensi 2)
     class_map = {
         0: 'Normal',
         1: 'Pra Hipertensi',
@@ -128,15 +166,15 @@ def predict(usia: int, gender: str, berat: float, tinggi: float, sistolik: int, 
         3: 'Tingkat 2'
     }
 
-    # Ensemble Weighted Probabilities: 60% RF, 40% DT
+    # 5. Ensemble Weighted Probabilities: Bobot 60% Random Forest + 40% Decision Tree
     proba_ensemble = 0.60 * proba_rf + 0.40 * proba_dt
     final_class_idx = int(np.argmax(proba_ensemble))
     final_result = class_map[final_class_idx]
 
-    # Confidence score: persentase probabilitas kelas pemenang (dijamin 50-100%)
+    # Skor keyakinan persentase kelas terpilih
     conf_score = round(float(proba_ensemble[final_class_idx]) * 100, 1)
 
-    # Pulse Pressure (Tekanan Nadi)
+    # 6. Analisis Tekanan Nadi (Pulse Pressure) - Indikator Risiko Kardiovaskular Lanjutan
     pulse_pressure = int(sistolik - diastolik)
     pp_warning = pulse_pressure >= 60
 
@@ -168,6 +206,10 @@ def predict(usia: int, gender: str, berat: float, tinggi: float, sistolik: int, 
     }
 
 def main():
+    """
+    Titik masuk eksekusi antarmuka CLI untuk sistem inferensi:
+    Menerima argumen individual atau string JSON dari proses pemanggil Laravel.
+    """
     parser = argparse.ArgumentParser(description="Inference Engine Model Hipertensi")
     parser.add_argument("--json", type=str, help="Input dalam format JSON string")
     parser.add_argument("--usia", type=int, help="Usia pasien (tahun)")
@@ -179,6 +221,7 @@ def main():
 
     args = parser.parse_args()
 
+    # Parsing input JSON jika disediakan
     if args.json:
         try:
             data = json.loads(args.json)
@@ -192,6 +235,7 @@ def main():
             print(json.dumps({"status": "error", "message": f"Format JSON tidak valid: {str(e)}"}))
             sys.exit(1)
     else:
+        # Parsing dari flag CLI individual
         if args.usia is None or args.gender is None or args.berat is None or args.tinggi is None or args.sistolik is None or args.diastolik is None:
             print(json.dumps({"status": "error", "message": "Argumen klinis tidak lengkap. Harap sertakan --usia, --gender, --berat, --tinggi, --sistolik, --diastolik atau --json"}))
             sys.exit(1)
@@ -202,6 +246,7 @@ def main():
         sistolik = args.sistolik
         diastolik = args.diastolik
 
+    # Eksekusi inferensi dan cetak respons JSON ke stdout
     try:
         output = predict(usia, gender, berat, tinggi, sistolik, diastolik)
         print(json.dumps(output, ensure_ascii=False))
@@ -214,3 +259,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

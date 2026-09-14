@@ -9,32 +9,44 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Http\Resources\DoctorProfileResource;
 
+/**
+ * Controller Otentikasi & Akun Tenaga Medis (Auth Controller)
+ * Menangani siklus autentikasi dokter/petugas: login dengan token Sanctum, registrasi akun baru,
+ * melihat profil klinisi, logout, serta alur pemulihan kata sandi (forgot & reset password).
+ */
 class AuthController extends Controller
 {
     /**
-     * Authenticate Clinician & return API token
+     * Otentikasi klinisi dan pembuatan Bearer Token Sanctum.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
+        // 1. Validasi input kredensial masuk
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
+        // 2. Cari pengguna berdasarkan username
         $user = User::where('username', $credentials['username'])->first();
 
+        // 3. Verifikasi keberadaan user dan kecocokan hash password
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'message' => 'Username atau Password salah.'
             ], 401);
         }
 
-        // Revoke existing tokens if any
+        // 4. Cabut token lama jika ada untuk mencegah token ganda
         $user->tokens()->delete();
 
-        // Create new Sanctum personal access token
+        // 5. Buat token akses pribadi baru via Laravel Sanctum
         $token = $user->createToken('clinician-session')->plainTextToken;
 
+        // 6. Catat aktivitas login berhasil ke audit trail notifikasi
         \App\Models\Notification::logActivity(
             $user->id,
             'Sesi Masuk Berhasil',
@@ -49,7 +61,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Get authenticated clinician profile
+     * Mengambil data profil tenaga medis yang sedang login.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \App\Http\Resources\DoctorProfileResource
      */
     public function profile(Request $request)
     {
@@ -57,11 +72,16 @@ class AuthController extends Controller
     }
 
     /**
-     * Terminate clinician session
+     * Mengakhiri sesi masuk pengguna dan menghapus token akses aktif.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
         $user = $request->user();
+        
+        // Catat aktivitas keluar sesi ke audit trail notifikasi
         \App\Models\Notification::logActivity(
             $user->id,
             'Keluar Sistem',
@@ -69,6 +89,7 @@ class AuthController extends Controller
             'info'
         );
 
+        // Hapus token akses yang sedang digunakan saat ini
         $user->currentAccessToken()->delete();
 
         return response()->json([
@@ -77,10 +98,14 @@ class AuthController extends Controller
     }
 
     /**
-     * Register a new user account
+     * Mendaftarkan akun tenaga medis / pengguna baru.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
     {
+        // Validasi data pendaftaran dengan pesan kesalahan berbahasa Indonesia
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username',
@@ -93,6 +118,7 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 6 karakter.',
         ]);
 
+        // Buat akun pengguna baru dengan spesialisasi default Puskesmas Kembaran 1
         $user = User::create([
             'name' => $validated['name'],
             'username' => $validated['username'],
@@ -108,7 +134,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Generate a password reset token and return it
+     * Membuat token pemulihan kata sandi (Forgot Password).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function forgotPassword(Request $request)
     {
@@ -124,27 +153,30 @@ class AuthController extends Controller
             ], 404);
         }
 
-        // Delete any existing token for this email
+        // Hapus token lama yang belum digunakan untuk email ini
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
-        // Generate a simple 6-character token
+        // Buat token alfanumerik 6 karakter huruf kapital
         $token = strtoupper(Str::random(6));
 
+        // Simpan hash token ke database beserta timestamp pembuatan
         DB::table('password_reset_tokens')->insert([
             'email' => $request->email,
             'token' => Hash::make($token),
             'created_at' => now(),
         ]);
 
-        // In production, this would be sent via email.
-        // For development, the token is returned directly in the response.
+        // Pada mode lokal/pengembangan, token ditampilkan langsung pada respons JSON
         return response()->json([
             'message' => "Token reset password telah dibuat. Gunakan token berikut: {$token}",
         ]);
     }
 
     /**
-     * Reset password using token
+     * Mereset kata sandi menggunakan token verifikasi 6 karakter.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function resetPassword(Request $request)
     {
@@ -164,7 +196,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // Check if token is expired (60 minutes)
+        // Cek masa berlaku token (maksimal 60 menit)
         if (now()->diffInMinutes($record->created_at) > 60) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
             return response()->json([
@@ -172,18 +204,19 @@ class AuthController extends Controller
             ], 400);
         }
 
+        // Verifikasi kesesuaian token yang dimasukkan dengan hash di database
         if (!Hash::check($request->token, $record->token)) {
             return response()->json([
                 'message' => 'Token tidak valid.'
             ], 400);
         }
 
-        // Update password
+        // Simpan kata sandi baru pengguna
         $user = User::where('email', $request->email)->first();
         $user->password = $request->password;
         $user->save();
 
-        // Clean up token
+        // Bersihkan token yang sudah berhasil digunakan
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json([

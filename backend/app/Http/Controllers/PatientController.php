@@ -6,32 +6,49 @@ use App\Models\Patient;
 use Illuminate\Http\Request;
 use App\Http\Resources\PatientResource;
 
+/**
+ * Controller Manajemen Pasien (Patient Controller)
+ * Menangani alur data pasien: melihat daftar pasien, detail pasien, registrasi baru,
+ * pembaruan demografi klinis, dan penghapusan data pasien.
+ */
 class PatientController extends Controller
 {
     /**
-     * Display a listing of registered patients
+     * Mengambil daftar seluruh pasien terdaftar.
+     * Diurutkan berdasarkan tanggal pendaftaran terbaru (LIFO).
+     *
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        // Return latest patients
+        // Ambil data pasien terurut dari yang paling baru didaftarkan
         $patients = Patient::orderBy('created_at', 'desc')->get();
         return PatientResource::collection($patients);
     }
 
     /**
-     * Display a single patient record
+     * Menampilkan detail satu rekam medis pasien berdasarkan ID unik.
+     *
+     * @param  string  $id  ID unik pasien (contoh: PT-2023-001)
+     * @return \App\Http\Resources\PatientResource
      */
     public function show(string $id)
     {
+        // Cari data pasien atau lempar HTTP 404 jika tidak ditemukan
         $patient = Patient::findOrFail($id);
         return new PatientResource($patient);
     }
 
     /**
-     * Store a newly created patient in registry database
+     * Mendaftarkan pasien baru ke dalam registri klinik.
+     * Menghasilkan nomor rekam medis otomatis dengan format PT-2023-XXX.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
+        // 1. Validasi masukan data demografi pasien
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'age' => 'required|integer|min:1',
@@ -42,17 +59,18 @@ class PatientController extends Controller
             'status' => 'required|string',
         ]);
 
-        // Generate next PT id
+        // 2. Generate Nomor Rekam Medis (ID Pasien) otomatis berurutan (3 digit zero-padded)
         $count = Patient::count();
         $generatedId = 'PT-2023-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
 
-        // Standard simulated bp history entries
+        // 3. Inisialisasi riwayat tekanan darah awal sebagai baseline observasi berkala
         $mockBPHistory = [
             ['date' => 'Mei', 'systolic' => 120, 'diastolic' => 80],
             ['date' => 'Jun', 'systolic' => 122, 'diastolic' => 81],
             ['date' => 'Jul', 'systolic' => 125, 'diastolic' => 83]
         ];
 
+        // 4. Simpan rekam medis pasien baru ke database MySQL
         $patient = Patient::create([
             'id' => $generatedId,
             'name' => $validated['name'],
@@ -66,6 +84,7 @@ class PatientController extends Controller
             'bp_history' => $mockBPHistory
         ]);
 
+        // 5. Catat log aktivitas ke dalam audit trail notifikasi
         \App\Models\Notification::logActivity(
             $request->user()->id,
             'Pasien Terdaftar',
@@ -77,12 +96,17 @@ class PatientController extends Controller
     }
 
     /**
-     * Update clinician demographics for patient
+     * Memperbarui informasi profil atau demografi klinis pasien.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id  ID unik pasien
+     * @return \App\Http\Resources\PatientResource
      */
     public function update(Request $request, string $id)
     {
         $patient = Patient::findOrFail($id);
 
+        // Validasi input data pembaruan yang bersifat kondisional (sometimes)
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'age' => 'sometimes|required|integer|min:1',
@@ -95,6 +119,7 @@ class PatientController extends Controller
 
         $patient->update($validated);
 
+        // Catat aktivitas pembaruan ke log notifikasi
         \App\Models\Notification::logActivity(
             $request->user()->id,
             'Data Pasien Diperbarui',
@@ -106,12 +131,17 @@ class PatientController extends Controller
     }
 
     /**
-     * Remove the specified patient from registry
+     * Menghapus catatan rekam medis pasien dari database.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id  ID unik pasien
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, string $id)
     {
         $patient = Patient::findOrFail($id);
         
+        // Catat log peringatan audit sebelum penghapusan data
         \App\Models\Notification::logActivity(
             $request->user()->id,
             'Pasien Dihapus',

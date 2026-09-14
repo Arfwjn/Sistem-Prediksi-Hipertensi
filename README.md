@@ -122,9 +122,9 @@ Ikuti langkah-langkah berikut secara berurutan. Panduan ini dirancang agar mudah
 1. Buka **Command Prompt (CMD)** atau **PowerShell**.
 2. Masuk ke folder backend proyek ini:
    ```bash
-   cd "C:\Users\ACER\Downloads\Skripsi Hipertensi\Klinikal Hipertensi\backend"
+   cd backend
    ```
-   *(Sesuaikan path folder dengan lokasi tempat Anda menyimpan proyek ini).*
+   *(Atau arahkan terminal ke folder `backend` di dalam direktori proyek Anda).*
 
 3. Salin berkas konfigurasi lingkungan:
    - Jika menggunakan **Command Prompt / Windows CMD**:
@@ -184,15 +184,13 @@ Ikuti langkah-langkah berikut secara berurutan. Panduan ini dirancang agar mudah
    ```bash
    python -m pip install scikit-learn joblib pandas numpy imbalanced-learn
    ```
-4. *(Opsional)* Jika Anda ingin melatih ulang model benchmark dari dataset asli skripsi:
-   ```bash
-   cd "C:\Users\ACER\Downloads\Skripsi Hipertensi\Klinikal Hipertensi\backend\ml_engine"
-   python train_benchmark.py
-   ```
-   *Skrip ini akan memuat dataset, melakukan preprocessing, SMOTE balancing, melatih Decision Tree & Random Forest, lalu mengekspor model `.pkl` ke subfolder `models/`.*
+4. **Model Machine Learning Siap Pakai**:
+   Model machine learning (`scaler_hipertensi.pkl`, `model_decision_tree_clinical.pkl`, `model_random_forest_clinical.pkl`) sudah disediakan siap pakai di dalam folder `backend/ml_engine/models/`. Model ini dihasilkan secara *offline* dari proses eksperimen di Jupyter Notebook (`Skripsi_Hipertensi_Triana.ipynb`). Anda tidak perlu melakukan proses *training* ulang untuk menjalankan aplikasi web.
 
 5. **Uji inferensi model Python secara langsung**:
+   Masuk ke folder `backend/ml_engine` lalu jalankan skrip inferensi:
    ```bash
+   cd backend/ml_engine
    python predict.py --usia 45 --gender L --berat 70 --tinggi 165 --sistolik 140 --diastolik 90
    ```
    *Jika berhasil, Anda akan melihat keluaran JSON dengan hasil `"result": "Tingkat 1"` dan skor keyakinan persentase.*
@@ -202,9 +200,10 @@ Ikuti langkah-langkah berikut secara berurutan. Panduan ini dirancang agar mudah
 ### Langkah 4: Menyiapkan dan Menjalankan Frontend React
 
 1. Buka jendela **Command Prompt (CMD) atau PowerShell baru lagi**.
-2. Masuk ke folder root frontend proyek:
+2. Masuk ke folder root utama proyek (tempat file `package.json` berada):
    ```bash
-   cd "C:\Users\ACER\Downloads\Skripsi Hipertensi\Klinikal Hipertensi"
+   cd ..
+   # Atau jika dari terminal baru, arahkan langsung ke folder root proyek
    ```
 3. Pasang dependensi JavaScript:
    ```bash
@@ -289,15 +288,14 @@ Klinikal Hipertensi/
 ├── backend/
 │   ├── ml_engine/
 │   │   ├── models/                                      <-- [A] TEMPAT FILE BINARY MODEL
-│   │   │   ├── scaler_hipertensi.pkl                    <-- Objek StandardScaler
-│   │   │   ├── model_decision_tree_clinical.pkl         <-- Model Decision Tree
-│   │   │   ├── model_random_forest_clinical.pkl         <-- Model Random Forest
-│   │   │   └── model_metadata.json                      <-- Catatan akurasi & parameter
-│   │   ├── train_benchmark.py                           <-- [B] SKRIP PELATIHAN & EKSPOR
-│   │   └── predict.py                                   <-- [C] JEMBATAN INFERENSI PYTHON
+│   │   │   ├── scaler_hipertensi.pkl                    <-- Objek StandardScaler (dari Skripsi_Hipertensi_Triana.ipynb)
+│   │   │   ├── model_decision_tree_clinical.pkl         <-- Model Decision Tree (dari Skripsi_Hipertensi_Triana.ipynb)
+│   │   │   ├── model_random_forest_clinical.pkl         <-- Model Random Forest (dari Skripsi_Hipertensi_Triana.ipynb)
+│   │   │   └── model_metadata.json                      <-- Catatan metrik & parameter skenario
+│   │   └── predict.py                                   <-- [B] JEMBATAN INFERENSI PYTHON (Inference Engine)
 │   │
 │   └── app/Http/Controllers/
-│       └── PredictionController.php                     <-- [D] KONTROLER LARAVEL
+│       └── PredictionController.php                     <-- [C] KONTROLER LARAVEL
 │
 └── src/
     ├── features/prediction/
@@ -407,7 +405,7 @@ Jika model baru Anda membutuhkan fitur input tambahan selain 8 fitur standar:
      ```env
      PYTHON_BINARY=C:\Users\NAMA_USER_ANDA\AppData\Local\Programs\Python\Python311\python.exe
      ```
-     *(Atau `PYTHON_BINARY=D:\Python314\python.exe`).*
+     *(Atau biarkan `PYTHON_BINARY=python` jika Python sudah terdaftar di PATH).*
 
 ### 3. Port 8000 atau Port 3000 sudah terpakai (EADDRINUSE)
 - **Solusi**:

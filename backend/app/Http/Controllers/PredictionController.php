@@ -215,13 +215,9 @@ class PredictionController extends Controller
     {
         $scriptPath = base_path('ml_engine/predict.py');
 
-        // Cari executable Python: utamakan konfigurasi .env, lalu fallback ke lokasi umum
+        // Cari executable Python: utamakan konfigurasi .env (PYTHON_BINARY), lalu fallback ke perintah sistem 'python' atau 'python3'
         $pythonCandidates = array_filter([
             env('PYTHON_BINARY'),
-            'D:\\Python314\\python.exe',
-            'C:\\Python312\\python.exe',
-            'C:\\Python311\\python.exe',
-            'C:\\Python310\\python.exe',
             'python',
             'python3'
         ]);

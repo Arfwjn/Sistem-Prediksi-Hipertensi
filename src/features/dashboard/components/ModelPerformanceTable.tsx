@@ -2,19 +2,19 @@ import React from 'react';
 
 const PERFORMANCE_DATA = [
   {
-    name: 'Random Forest (RF)',
-    accuracy: '96.5%',
-    precision: '96.1%',
-    recall: '96.7%',
-    f1Score: '96.4%',
+    name: 'Random Forest (+ SMOTE)',
+    accuracy: '99.97%',
+    precision: '99.98%',
+    recall: '99.98%',
+    f1Score: '99.98%',
     isRecommended: true,
   },
   {
-    name: 'Decision Tree (DT)',
-    accuracy: '93.8%',
-    precision: '93.5%',
-    recall: '93.9%',
-    f1Score: '93.7%',
+    name: 'Decision Tree (+ SMOTE)',
+    accuracy: '100.00%',
+    precision: '100.00%',
+    recall: '100.00%',
+    f1Score: '100.00%',
     isRecommended: false,
   }
 ];
@@ -27,7 +27,7 @@ export default function ModelPerformanceTable() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-1">Perbandingan Performa Algoritma ML</h4>
-            <p className="text-xs text-slate-400 font-medium" title="Evaluasi model menggunakan pengujian 10-Fold Cross Validation">Metrik evaluasi model klasifikasi Hipertensi AI (10-Fold CV)</p>
+            <p className="text-xs text-slate-400 font-medium" title="Evaluasi model pada data uji murni X_test (Skenario 1 - Clinical Staging)">Metrik evaluasi Skenario 1 (+ SMOTE) pada Data Uji (X_test)</p>
           </div>
         </div>
 

@@ -2,27 +2,27 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BarChart3, TreeDeciduous, Trees, TrendingUp, Target, Crosshair, Award, Info, ChevronDown } from 'lucide-react';
 
-// Dummy evaluation data
+// Data Evaluasi Model Skripsi BAB IV (Skenario 1 + SMOTE pada Data Uji X_test)
 const evaluationData = {
   decisionTree: {
-    name: 'Decision Tree',
+    name: 'Decision Tree (+ SMOTE)',
     icon: TreeDeciduous,
     color: 'blue',
-    accuracy: 89.2,
-    precision: 87.5,
-    recall: 88.1,
-    f1Score: 87.8,
-    description: 'Model klasifikasi berbasis pohon keputusan yang membagi data secara rekursif berdasarkan fitur terbaik.',
+    accuracy: 100.0,
+    precision: 100.0,
+    recall: 100.0,
+    f1Score: 100.0,
+    description: 'Model Decision Tree dengan penyeimbangan data latih SMOTE. Mampu merekonstruksi aturan deterministik JNC 7 secara sempurna tanpa data leakage.',
   },
   randomForest: {
-    name: 'Random Forest',
+    name: 'Random Forest (+ SMOTE)',
     icon: Trees,
     color: 'emerald',
-    accuracy: 94.7,
-    precision: 93.2,
-    recall: 94.0,
-    f1Score: 93.6,
-    description: 'Ensemble dari banyak decision tree untuk meningkatkan akurasi dan mengurangi overfitting.',
+    accuracy: 99.97,
+    precision: 99.98,
+    recall: 99.98,
+    f1Score: 99.98,
+    description: 'Ensemble 100 pohon keputusan dengan penyeimbangan SMOTE pada data latih. Menghasilkan generalisasi terbaik (F1-Score 99.98%) pada data uji murni.',
   },
 };
 
