@@ -9,8 +9,8 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoggedIn } = useAuthStore();
 
-  const [username, setUsername] = useState('arfwjn');
-  const [password, setPassword] = useState('arfwjn');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');

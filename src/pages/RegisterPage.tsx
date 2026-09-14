@@ -42,7 +42,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await api.post('/auth/register', {
+      await api.post('/register', {
         name: name.trim(),
         username: username.trim(),
         email: email.trim(),

@@ -4,6 +4,7 @@ import { defaultDoctor } from '../constants/mockData';
 import { authService } from '../services/authService';
 import { settingsService } from '../services/settingsService';
 import { useNotificationStore } from './notificationStore';
+import api from '../services/api';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -35,6 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = await authService.login(credentials);
       localStorage.setItem('token', data.token);
       localStorage.setItem('doctor', JSON.stringify(data.doctor));
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
       set({
         isLoggedIn: true,
         token: data.token,
@@ -57,6 +59,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('doctor');
+      delete api.defaults.headers.common['Authorization'];
       set({
         isLoggedIn: false,
         token: null,
