@@ -35,12 +35,52 @@ export function useHistory() {
 
   const handleExport = (format: 'PDF' | 'CSV') => {
     setExporting(true);
+    if (format === 'CSV') {
+      const headers = [
+        'ID Rekam',
+        'ID Pasien',
+        'Nama Pasien',
+        'Usia',
+        'Jenis Kelamin',
+        'Berat Badan (kg)',
+        'Tinggi Badan (cm)',
+        'IMT (kg/m2)',
+        'Sistolik (mmHg)',
+        'Diastolik (mmHg)',
+        'Hasil Klasifikasi',
+        'Skor Kepercayaan (%)',
+        'Tanggal Pemeriksaan'
+      ];
+      const rows = filtered.map((r) => [
+        r.id,
+        r.patientId,
+        `"${r.patientName.replace(/"/g, '""')}"`,
+        r.age,
+        r.gender === 'L' ? 'Laki-laki' : 'Perempuan',
+        r.weight,
+        r.height,
+        r.bmi,
+        r.systolic,
+        r.diastolic,
+        `"${r.result}"`,
+        r.confidenceScore,
+        `"${r.date}"`
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `riwayat_klasifikasi_hipertensi_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
     setTimeout(() => {
       setExporting(false);
-      setToastMessage(`Laporan berhasil diexport dalam format ${format}! File tersimpan di sistem.`);
+      setToastMessage(`Laporan riwayat klinis berhasil diexport (${format})!`);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
-    }, 1500);
+    }, 600);
   };
 
   const handleDeleteRecord = (id: string) => {

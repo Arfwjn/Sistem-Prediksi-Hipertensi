@@ -76,7 +76,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             </div>
 
             {/* Scrollable Content */}
-            <div className="px-6 py-5 overflow-y-auto flex-1 text-sm text-slate-600">
+            <div className="px-6 py-5 overflow-y-auto overflow-x-hidden flex-1 text-sm text-slate-600">
               {children}
             </div>
           </motion.div>

@@ -22,13 +22,16 @@ api.interceptors.request.use(
   }
 );
 
-// Response Interceptor: Auto-logout on 401 Unauthorized
+// Response Interceptor: Auto-logout on 401 Unauthorized for authenticated routes
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Auto-logout physician session if token expires or is rejected
-      useAuthStore.getState().logout();
+      // Do not trigger global logout if the 401 was from the login endpoint itself
+      const requestUrl = error.config?.url || '';
+      if (!requestUrl.includes('/login')) {
+        useAuthStore.getState().logout();
+      }
     }
     return Promise.reject(error);
   }

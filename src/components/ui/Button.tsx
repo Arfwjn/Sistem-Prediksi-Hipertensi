@@ -16,34 +16,32 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          // Base: clean, modern button with smooth transitions
-          'group relative inline-flex items-center justify-center font-medium select-none outline-none cursor-pointer shrink-0',
-          'transition-all duration-200 ease-out',
-          'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
-          // Minimalist hover: subtle lift + shadow
-          isInteractive && 'hover:-translate-y-[1px] hover:shadow-md active:translate-y-0 active:shadow-sm active:scale-[0.98]',
+          // Base: tactile realistic button with physical click feel
+          'group relative inline-flex items-center justify-center font-semibold select-none outline-none cursor-pointer shrink-0',
+          'transition-all duration-100 active:translate-y-[1px]',
+          'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:active:translate-y-0',
           // Size Mappings
           {
-            'h-9 px-4 text-xs gap-1.5 rounded-lg': size === 'sm',
-            'h-11 px-5 text-sm gap-2 rounded-xl': size === 'md',
-            'h-14 px-6 text-base gap-2 rounded-2xl': size === 'lg',
+            'h-9 px-3.5 text-xs gap-1.5 rounded-lg': size === 'sm',
+            'h-10 px-4 text-sm gap-2 rounded-lg': size === 'md',
+            'h-12 px-5 text-base gap-2 rounded-xl': size === 'lg',
           },
-          // Variant styles — solid backgrounds with subtle hover brightness shifts
+          // Variant styles — realistic skeuomorphic solid tactile colors
           {
-            // Primary: gradient blue with lighter hover
-            'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-600/20 shadow-sm shadow-blue-600/10 hover:from-blue-500 hover:to-indigo-500 hover:shadow-blue-500/20 hover:text-white':
+            // Primary: solid tactile blue
+            'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white border border-blue-700 border-b-2 shadow-xs active:border-b active:shadow-none':
               variant === 'primary',
-            // Secondary: neutral with darkening hover
-            'bg-slate-100 text-slate-700 border border-slate-200 shadow-sm hover:bg-slate-200/80 hover:text-slate-800 hover:border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700':
+            // Secondary: tactile neutral
+            'bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 border border-slate-300 border-b-2 shadow-xs active:border-b active:shadow-none':
               variant === 'secondary',
-            // Outline: transparent with fill-in hover
-            'bg-white text-slate-600 border border-slate-300 shadow-sm hover:bg-slate-50 hover:text-slate-800 hover:border-slate-400 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200':
+            // Outline: crisp border with tactile depth
+            'bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 border border-slate-300 border-b-2 shadow-xs active:border-b active:shadow-none':
               variant === 'outline',
-            // Danger: red gradient with lighter hover
-            'bg-gradient-to-r from-rose-500 to-red-600 text-white border border-rose-500/20 shadow-sm shadow-rose-500/10 hover:from-rose-400 hover:to-red-500 hover:shadow-rose-400/20 hover:text-white':
+            // Danger: solid tactile red
+            'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white border border-red-700 border-b-2 shadow-xs active:border-b active:shadow-none':
               variant === 'danger',
-            // Ghost: invisible with subtle bg hover
-            'bg-transparent text-slate-600 border border-transparent hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white':
+            // Ghost: transparent with subtle hover
+            'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent active:translate-y-0':
               variant === 'ghost',
           },
           className

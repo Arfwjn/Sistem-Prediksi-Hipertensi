@@ -1,23 +1,23 @@
 import React, { HTMLAttributes, forwardRef } from 'react';
-import { GlowCard } from './spotlight-card';
 import { cn } from '../../utils/cn';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   hoverEffect?: boolean;
-  glow?: boolean;
-  glowColor?: 'blue' | 'purple' | 'green' | 'red' | 'orange';
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, glowColor = 'blue', children, ...props }, ref) => {
+  ({ className, children, ...props }, ref) => {
     return (
-      <GlowCard
-        className={cn("", className)}
-        glowColor={glowColor}
-        customSize={true}
+      <div
+        ref={ref}
+        className={cn(
+          "bg-white border border-slate-200 rounded-xl shadow-xs transition-colors hover:border-slate-300 text-left",
+          className
+        )}
+        {...props}
       >
         {children}
-      </GlowCard>
+      </div>
     );
   }
 );

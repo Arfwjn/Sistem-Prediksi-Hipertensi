@@ -5,28 +5,6 @@ import { User, Lock, ArrowRight, Eye, EyeOff, ShieldCheck, Mail, UserPlus } from
 import { Button } from '../components/ui/Button';
 import api from '../services/api';
 
-// Animated floating particle component
-function FloatingParticle({ delay, size, x, y, duration }: { delay: number; size: number; x: string; y: string; duration: number }) {
-  return (
-    <motion.div
-      className="absolute rounded-full bg-indigo-400/15 pointer-events-none"
-      style={{ width: size, height: size, left: x, top: y }}
-      animate={{
-        y: [0, -25, 0],
-        x: [0, 12, 0],
-        opacity: [0.3, 0.6, 0.3],
-        scale: [1, 1.15, 1],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        delay,
-        ease: 'easeInOut',
-      }}
-    />
-  );
-}
-
 export default function RegisterPage() {
   const navigate = useNavigate();
 
@@ -51,82 +29,62 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password !== passwordConfirmation) {
-      setError('Konfirmasi password tidak cocok.');
+    if (password.length < 6) {
+      setError('Password minimal 6 karakter.');
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password minimal 6 karakter.');
+    if (password !== passwordConfirmation) {
+      setError('Konfirmasi password tidak cocok.');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      await api.post('/register', {
-        name,
-        username,
-        email,
+      await api.post('/auth/register', {
+        name: name.trim(),
+        username: username.trim(),
+        email: email.trim(),
         password,
         password_confirmation: passwordConfirmation,
       });
+
       setSuccess('Registrasi berhasil! Mengalihkan ke halaman login...');
-      setTimeout(() => navigate('/login'), 2000);
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Registrasi gagal. Silakan coba lagi.';
-      setError(msg);
+      const data = err.response?.data;
+      if (data?.errors) {
+        const firstError = Object.values(data.errors)[0];
+        setError(Array.isArray(firstError) ? firstError[0] : String(firstError));
+      } else {
+        setError(data?.message || err.message || 'Registrasi gagal. Silakan coba lagi.');
+      }
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/40 to-blue-50/30 flex items-center justify-center p-4 font-sans antialiased selection:bg-indigo-500 selection:text-white relative overflow-hidden">
-      {/* Animated background particles */}
-      <FloatingParticle delay={0} size={70} x="8%" y="25%" duration={7} />
-      <FloatingParticle delay={1.2} size={55} x="85%" y="12%" duration={6} />
-      <FloatingParticle delay={2} size={90} x="75%" y="65%" duration={8} />
-      <FloatingParticle delay={0.8} size={45} x="15%" y="80%" duration={9} />
-      <FloatingParticle delay={1.8} size={60} x="55%" y="8%" duration={5.5} />
-
-      {/* Subtle radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-200/20 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans antialiased selection:bg-blue-600 selection:text-white relative">
       {/* Main card */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-[420px] relative z-10"
-      >
-        {/* Glass card */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-8 md:p-10">
+      <div className="w-full max-w-[420px] relative z-10">
+        {/* Solid authentic card */}
+        <div className="bg-white rounded-2xl border border-slate-200 border-b-4 shadow-sm p-8 md:p-10">
 
           {/* Logo and header */}
           <div className="text-center mb-7">
-            <motion.div
-              whileHover={{ scale: 1.08, rotate: -3 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-14 h-14 mx-auto mb-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center cursor-pointer overflow-hidden"
-            >
+            <div className="w-14 h-14 mx-auto mb-4 bg-white rounded-xl border border-slate-200 border-b-2 shadow-xs flex items-center justify-center overflow-hidden">
               <img src="/logo_banyumas.png" alt="Logo" className="w-10 h-10 object-contain" />
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="text-2xl font-bold text-slate-900 tracking-tight"
-            >
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               Buat Akun Baru
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="text-sm text-slate-500 mt-1.5 font-medium"
-            >
+            </h1>
+            <p className="text-sm text-slate-500 mt-1 font-medium">
               Daftarkan akun untuk akses sistem
-            </motion.p>
+            </p>
           </div>
 
           {/* Form */}
@@ -315,15 +273,10 @@ export default function RegisterPage() {
         </div>
 
         {/* Bottom brand tag */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none"
-        >
+        <p className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none">
           Klasifikasi Hipertensi Puskesmas Kembaran 1 &copy; {new Date().getFullYear()}
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 }

@@ -52,31 +52,28 @@ export default function Sidebar() {
   };
 
   const SidebarContent = () => (
-    <div className="h-full flex flex-col py-6 bg-white border-r border-slate-200/85 shadow-sm">
+    <div className="h-full flex flex-col py-5 px-3 bg-white border-r border-slate-200">
       {/* Brand Header */}
-      <div className="flex items-center gap-3 px-6 mb-10 select-none">
-        <div className="w-10 h-10 rounded-xl bg-blue-50/70 flex items-center justify-center border border-blue-100/50 overflow-hidden">
-          <img src="/logo_banyumas.png" alt="Logo Puskesmas" className="w-8 h-8 object-contain" />
-        </div>
-        <div>
-          <h1 className="text-lg font-bold text-slate-950 tracking-tight leading-none">Sistem Klasifikasi</h1>
-          <p className="text-xs font-semibold text-slate-400 mt-1">Hipertensi AI</p>
+      <div className="flex items-center gap-3 px-3 mb-6 select-none">
+        <img src="/logo_banyumas.png" alt="Logo Puskesmas" className="w-8 h-8 object-contain shrink-0" />
+        <div className="min-w-0">
+          <h1 className="text-sm font-bold text-slate-900 leading-tight truncate">Puskesmas 1 Kembaran</h1>
+          <p className="text-[11px] text-slate-500 font-medium truncate">Sistem Hipertensi AI</p>
         </div>
         {isOpenMobile && (
           <button 
             type="button" 
             onClick={() => setIsOpenMobile(false)}
-            className="ml-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all md:hidden cursor-pointer"
+            className="ml-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors md:hidden cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         )}
       </div>
 
-      {/* Main Navigation List */}
-      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto">
+      {/* Main Navigation List - Simple, flat, authentic items */}
+      <nav className="flex-1 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
-          // Check if active path matches
           const isActive = location.pathname.startsWith(item.path);
           const Icon = item.icon;
           return (
@@ -84,87 +81,42 @@ export default function Sidebar() {
               key={item.path}
               to={item.path}
               onClick={() => setIsOpenMobile(false)}
-              className="w-full text-left group flex items-center gap-3.5 px-4 py-3 rounded-2xl relative transition-all duration-200 decoration-none"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors decoration-none ${
+                isActive 
+                  ? 'bg-slate-900 text-white shadow-xs' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
             >
-              {isActive && (
-                <motion.div
-                  layoutId="activeBar"
-                  className="absolute inset-0 bg-blue-50/80 rounded-2xl border border-blue-100/50 shadow-sm z-0"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-              <div className={`relative z-10 p-2 rounded-xl transition-all duration-200
-                ${isActive 
-                  ? 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)] border border-blue-600' 
-                  : 'bg-slate-50 border border-slate-200/80 text-slate-400 group-hover:text-slate-600 group-hover:bg-slate-100'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="relative z-10 flex-grow select-none">
-                <span className={`text-sm font-semibold block transition-colors duration-200
-                  ${isActive ? 'text-blue-700' : 'text-slate-600 group-hover:text-slate-900'}
-                `}>
-                  {item.label}
-                </span>
-                <span className={`text-[10px] block font-medium transition-colors duration-200
-                  ${isActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-500'}
-                `}>
-                  {item.description}
-                </span>
-              </div>
+              <Icon className={`w-4.5 h-4.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-700'}`} />
+              <span className="truncate">{item.label}</span>
             </NavLink>
           );
         })}
       </nav>
 
-      {/* Footer Navigation (Settings & Logout) */}
-      <div className="px-4 mt-auto pt-6 border-t border-slate-100 space-y-1.5">
+      {/* Footer Navigation (Settings & Logout) - Simple & Flat */}
+      <div className="pt-3 mt-auto border-t border-slate-200 space-y-1">
         <NavLink
           to="/settings"
           onClick={() => setIsOpenMobile(false)}
           className={({ isActive }) =>
-            `w-full text-left group flex items-center gap-3.5 px-4 py-3.5 rounded-2xl relative transition-all duration-200 decoration-none
-            ${isActive ? 'bg-blue-50/50 border border-blue-100/50' : 'hover:bg-slate-50'}
-          `}
+            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors decoration-none ${
+              isActive 
+                ? 'bg-slate-900 text-white shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`
+          }
         >
-          {({ isActive }) => (
-            <>
-              <div className={`p-2 rounded-xl border transition-all duration-200
-                ${isActive 
-                  ? 'bg-blue-600 text-white shadow-md border-blue-600' 
-                  : 'bg-slate-50 border-slate-200/80 text-slate-400 group-hover:text-slate-600 group-hover:bg-slate-100'
-                }`}
-              >
-                <Settings className="w-5 h-5" />
-              </div>
-              <div className="select-none flex-1">
-                <span className={`text-sm font-semibold block transition-colors duration-200
-                  ${isActive ? 'text-blue-700' : 'text-slate-600 group-hover:text-slate-900'}
-                `}>
-                  Pengaturan
-                </span>
-                <span className="text-[10px] text-slate-400 block font-medium">Model & Profil Dokter</span>
-              </div>
-            </>
-          )}
+          <Settings className="w-4.5 h-4.5 shrink-0 text-slate-700" />
+          <span className="truncate">Pengaturan</span>
         </NavLink>
 
         <button
           onClick={handleLogoutClick}
-          className="w-full text-left group flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-red-50/60 transition-all duration-200 cursor-pointer"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
         >
-          <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 group-hover:text-red-600 group-hover:bg-red-100 group-hover:border-red-200 transition-all duration-200">
-            <LogOut className="w-5 h-5" />
-          </div>
-          <div className="select-none">
-            <span className="text-sm font-semibold text-slate-600 group-hover:text-red-700 block transition-colors duration-200">
-              Logout
-            </span>
-            <span className="text-[10px] text-slate-400 group-hover:text-red-500 block font-medium transition-colors duration-200">
-              Keluar dari akun
-            </span>
-          </div>
+          <LogOut className="w-4.5 h-4.5 shrink-0 text-slate-500 hover:text-red-600" />
+          <span className="truncate">Keluar</span>
         </button>
       </div>
     </div>
@@ -173,7 +125,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar Layout */}
-      <aside className="hidden md:flex flex-col h-screen w-72 shrink-0 sticky left-0 top-0 overflow-y-auto z-10">
+      <aside className="hidden md:flex flex-col h-screen w-64 shrink-0 sticky left-0 top-0 overflow-y-auto z-10">
         <SidebarContent />
       </aside>
 

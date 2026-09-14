@@ -15,12 +15,12 @@ export const Badge = ({ className, variant = 'default', children, ...props }: Ba
     return (
       <span
         className={cn(
-          'inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-lg border leading-none',
-          theme.bg,
+          'inline-flex items-center gap-1.5 text-xs font-semibold text-slate-800 select-none',
           className
         )}
         {...props}
       >
+        <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', theme.dot)} />
         {children || variant}
       </span>
     );
@@ -30,17 +30,14 @@ export const Badge = ({ className, variant = 'default', children, ...props }: Ba
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-lg leading-none border',
-        {
-          'bg-slate-50 text-slate-700 border-slate-200': variant === 'default' || variant === 'neutral',
-          'bg-emerald-50 text-emerald-700 border-emerald-200': variant === 'success',
-          'bg-amber-50 text-amber-700 border-amber-200': variant === 'warning',
-          'bg-rose-50 text-rose-700 border-rose-200': variant === 'danger',
-        },
+        'inline-flex items-center gap-1.5 text-xs font-semibold text-slate-800 select-none',
         className
       )}
       {...props}
     >
+      {variant === 'success' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />}
+      {variant === 'warning' && <span className="w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0" />}
+      {variant === 'danger' && <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />}
       {children}
     </span>
   );

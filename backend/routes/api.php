@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/settings', [SettingsController::class, 'show']);
     Route::put('/settings', [SettingsController::class, 'updateConfig']);
     Route::put('/profile/update', [SettingsController::class, 'updateProfile']);
+    Route::put('/profile/change-password', [SettingsController::class, 'changePassword']);
     
     // Database reset control
     Route::post('/database/reset', [SettingsController::class, 'resetDatabase']);

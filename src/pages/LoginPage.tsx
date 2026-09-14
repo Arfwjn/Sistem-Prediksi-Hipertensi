@@ -5,28 +5,6 @@ import { User, Lock, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { Button } from '../components/ui/Button';
 
-// Animated floating particle component
-function FloatingParticle({ delay, size, x, y, duration }: { delay: number; size: number; x: string; y: string; duration: number }) {
-  return (
-    <motion.div
-      className="absolute rounded-full bg-blue-400/15 pointer-events-none"
-      style={{ width: size, height: size, left: x, top: y }}
-      animate={{
-        y: [0, -30, 0],
-        x: [0, 15, 0],
-        opacity: [0.3, 0.7, 0.3],
-        scale: [1, 1.2, 1],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        delay,
-        ease: 'easeInOut',
-      }}
-    />
-  );
-}
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoggedIn } = useAuthStore();
@@ -57,7 +35,8 @@ export default function LoginPage() {
     
     try {
       await login({ username, password });
-      navigate('/dashboard');
+      setIsLoading(false);
+      navigate('/dashboard', { replace: true });
     } catch (err: any) {
       setError(err.message || 'Kredensial salah. Periksa kembali username dan password Anda.');
       setIsLoading(false);
@@ -65,53 +44,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/30 flex items-center justify-center p-4 font-sans antialiased selection:bg-blue-500 selection:text-white relative overflow-hidden">
-      {/* Animated background particles */}
-      <FloatingParticle delay={0} size={80} x="10%" y="20%" duration={6} />
-      <FloatingParticle delay={1} size={60} x="80%" y="15%" duration={8} />
-      <FloatingParticle delay={2} size={100} x="70%" y="70%" duration={7} />
-      <FloatingParticle delay={0.5} size={40} x="20%" y="75%" duration={9} />
-      <FloatingParticle delay={1.5} size={50} x="50%" y="10%" duration={5} />
-      <FloatingParticle delay={3} size={70} x="90%" y="50%" duration={6.5} />
-
-      {/* Subtle radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-200/20 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans antialiased selection:bg-blue-600 selection:text-white relative">
       {/* Main card */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-[420px] relative z-10"
-      >
-        {/* Glass card */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-8 md:p-10">
+      <div className="w-full max-w-[420px] relative z-10">
+        {/* Solid authentic card */}
+        <div className="bg-white rounded-2xl border border-slate-200 border-b-4 shadow-sm p-8 md:p-10">
           
           {/* Logo and header */}
           <div className="text-center mb-8">
-            <motion.div
-              whileHover={{ scale: 1.08, rotate: 3 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-16 h-16 mx-auto mb-5 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center cursor-pointer overflow-hidden"
-            >
+            <div className="w-16 h-16 mx-auto mb-4 bg-white rounded-xl border border-slate-200 border-b-2 shadow-xs flex items-center justify-center overflow-hidden">
               <img src="/logo_banyumas.png" alt="Logo" className="w-11 h-11 object-contain" />
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="text-2xl font-bold text-slate-900 tracking-tight"
-            >
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               Selamat Datang
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="text-sm text-slate-500 mt-1.5 font-medium"
-            >
+            </h1>
+            <p className="text-sm text-slate-500 mt-1 font-medium">
               Sistem Klasifikasi Tingkat Hipertensi
-            </motion.p>
+            </p>
           </div>
 
           {/* Form */}
@@ -283,15 +232,10 @@ export default function LoginPage() {
         </div>
 
         {/* Bottom brand tag */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none"
-        >
+        <p className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none">
           Klasifikasi Hipertensi Puskemas Kembaran 1 &copy; {new Date().getFullYear()}
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 }

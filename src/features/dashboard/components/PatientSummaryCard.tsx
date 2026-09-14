@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Users, Heart, Calendar } from 'lucide-react';
 import { usePatientStore } from '../../../stores/patientStore';
-import { GlowCard } from '../../../components/ui/spotlight-card';
 
 export default function PatientSummaryCard() {
   const patients = usePatientStore((state) => state.patients);
@@ -53,11 +52,7 @@ export default function PatientSummaryCard() {
   const hasData = patients.length > 0;
 
   return (
-    <GlowCard 
-      className="p-6 relative text-left h-full flex flex-col justify-between"
-      glowColor="blue"
-      customSize={true}
-    >
+    <div className="bg-white border border-slate-200 rounded-xl p-6 relative text-left h-full flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
       <div className="flex-shrink-0">
         <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-1">Ringkasan Klinis & Demografi</h4>
         <p className="text-xs text-slate-400 font-medium mb-6">Rangkuman data rata-rata pasien terdaftar di puskesmas</p>
@@ -72,9 +67,7 @@ export default function PatientSummaryCard() {
           {/* Row 1: Rata-rata Umur */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl">
-                <Calendar className="w-5 h-5" />
-              </div>
+              <Calendar className="w-5 h-5 text-slate-800 shrink-0" />
               <div>
                 <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block">Rata-rata Umur</span>
                 <span className="text-xs text-slate-400 font-semibold mt-0.5 block">Usia rata-rata pasien</span>
@@ -86,9 +79,7 @@ export default function PatientSummaryCard() {
           {/* Row 2: Rata-rata Tekanan Darah */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl">
-                <Heart className="w-5 h-5" />
-              </div>
+              <Heart className="w-5 h-5 text-slate-800 shrink-0" />
               <div>
                 <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block">Rata-rata Tekanan Darah</span>
                 <span className="text-xs text-slate-400 font-semibold mt-0.5 block">SYS / DIA pemeriksaan terakhir</span>
@@ -104,32 +95,26 @@ export default function PatientSummaryCard() {
 
           {/* Row 3: Rasio Gender */}
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4 text-blue-500" />
-                <span>Laki-laki ({stats.maleCount})</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>Perempuan ({stats.femaleCount})</span>
-                <Users className="w-4 h-4 text-pink-500" />
-              </div>
+            <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+              <span>Laki-laki ({stats.maleCount})</span>
+              <span>Perempuan ({stats.femaleCount})</span>
             </div>
             
             {/* Horizontal dual progress bar */}
-            <div className="w-full bg-pink-500 h-3.5 rounded-full overflow-hidden flex shadow-inner">
+            <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden flex">
               <div 
-                className="bg-blue-600 h-full border-r border-white/20 transition-all duration-500"
+                className="bg-slate-800 h-full transition-all duration-500"
                 style={{ width: `${stats.malePercent}%` }}
               />
             </div>
 
-            <div className="flex justify-between text-[10px] font-extrabold text-slate-400 tracking-wide select-none">
+            <div className="flex justify-between text-[10px] font-bold text-slate-400 tracking-wide select-none">
               <span>{stats.malePercent}% Laki-laki</span>
               <span>{stats.femalePercent}% Perempuan</span>
             </div>
           </div>
         </div>
       )}
-    </GlowCard>
+    </div>
   );
 }

@@ -1,6 +1,4 @@
 import React from 'react';
-import { Cpu, ShieldCheck, Activity } from 'lucide-react';
-import { GlowCard } from '../../../components/ui/spotlight-card';
 
 const PERFORMANCE_DATA = [
   {
@@ -10,7 +8,6 @@ const PERFORMANCE_DATA = [
     recall: '96.7%',
     f1Score: '96.4%',
     isRecommended: true,
-    badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200'
   },
   {
     name: 'Decision Tree (DT)',
@@ -19,35 +16,23 @@ const PERFORMANCE_DATA = [
     recall: '93.9%',
     f1Score: '93.7%',
     isRecommended: false,
-    badgeColor: 'bg-slate-50 text-slate-700 border-slate-200'
   }
 ];
 
 export default function ModelPerformanceTable() {
   return (
     <div className="px-4">
-      <GlowCard 
-        className="w-full p-6 relative text-left"
-        glowColor="blue"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-6 relative text-left shadow-xs hover:border-slate-300 transition-colors">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h4 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-1">Perbandingan Performa Algoritma ML</h4>
-            <p className="text-xs text-slate-400 font-medium">Metrik evaluasi model klasifikasi Hipertensi AI</p>
-          </div>
-          
-          <div className="flex gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-200/80 rounded-xl text-[10px] font-bold text-blue-700 select-none shadow-sm">
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Model K-Fold Evaluated</span>
-            </span>
+            <p className="text-xs text-slate-400 font-medium" title="Evaluasi model menggunakan pengujian 10-Fold Cross Validation">Metrik evaluasi model klasifikasi Hipertensi AI (10-Fold CV)</p>
           </div>
         </div>
 
         {/* Responsive Table Wrapper */}
-        <div className="overflow-x-auto w-full border border-slate-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto w-full border border-slate-200 rounded-xl bg-white shadow-xs">
           <table className="w-full text-left border-collapse min-w-[600px]">
             <thead className="bg-[#f8fafc]/90 border-b border-slate-200 select-none">
               <tr>
@@ -62,19 +47,21 @@ export default function ModelPerformanceTable() {
               {PERFORMANCE_DATA.map((row) => (
                 <tr 
                   key={row.name}
-                  className={`hover:bg-slate-50/50 transition-colors ${row.isRecommended ? 'bg-blue-50/20' : ''}`}
+                  className={`hover:bg-slate-50/50 transition-colors ${row.isRecommended ? 'bg-slate-50/80' : ''}`}
                 >
                   <td className="py-4.5 px-6 text-xs text-slate-900 flex items-center gap-2 select-text">
                     <span className="font-extrabold">{row.name}</span>
                     {row.isRecommended && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white border border-blue-600 shadow-sm select-none">
-                        <ShieldCheck className="w-3 h-3" />
-                        Rekomendasi
+                      <span 
+                        className="text-[11px] font-semibold text-slate-500 cursor-help select-none"
+                        title="Model dengan nilai akurasi dan F1-Score tertinggi"
+                      >
+                        (Rekomendasi)
                       </span>
                     )}
                   </td>
                   <td className="py-4.5 px-6 text-center select-none">
-                    <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-50 border border-emerald-150 text-emerald-800 rounded-lg text-xs font-bold min-w-[55px]">
+                    <span className="text-xs font-black text-slate-900">
                       {row.accuracy}
                     </span>
                   </td>
@@ -86,7 +73,8 @@ export default function ModelPerformanceTable() {
             </tbody>
           </table>
         </div>
-      </GlowCard>
+      </div>
     </div>
   );
 }
+

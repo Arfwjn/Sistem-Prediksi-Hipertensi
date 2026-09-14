@@ -60,8 +60,8 @@ export default function EvaluationPage() {
   const rf = evaluationData.randomForest;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 animate-fadeIn select-none pb-12">
-      {/* Page header */}
+    <div className="w-full max-w-7xl mx-auto space-y-5 animate-fadeIn select-none pb-12">
+      {/* Page header
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,40 +77,29 @@ export default function EvaluationPage() {
               <p className="text-xs text-slate-500 font-medium mt-0.5">Perbandingan performa Decision Tree vs Random Forest</p>
             </div>
           </div>
-          <div className="mt-3 p-3 bg-amber-50/60 border border-amber-100 rounded-xl flex items-start gap-2.5">
-            <Info className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-[11px] text-amber-700 font-medium leading-relaxed">
-              Data evaluasi di bawah menggunakan <strong>data dummy</strong>. Hasil akan diperbarui setelah model machine learning selesai dilatih dengan dataset aktual.
-            </p>
-          </div>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Model Overview Card (Combined) */}
       <div className="px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm cursor-pointer transition-all hover:shadow-md"
+          className="w-full rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm cursor-pointer transition-all hover:shadow-md"
           onClick={() => setExpandedModel(expandedModel ? null : 'models')}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-slate-600" />
-              </div>
+              <BarChart3 className="w-5 h-5 text-slate-800 shrink-0" />
               <div>
                 <h2 className="text-sm font-bold text-slate-800">Ringkasan Model</h2>
                 <p className="text-[10px] text-slate-500 font-medium mt-0.5">Decision Tree & Random Forest</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="px-2.5 py-1 rounded-full bg-blue-500 text-white text-[10px] font-bold">
-                DT {dt.accuracy}%
-              </div>
-              <div className="px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-bold">
-                RF {rf.accuracy}%
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-slate-600">
+                DT {dt.accuracy}% · RF {rf.accuracy}%
+              </span>
               <motion.div animate={{ rotate: expandedModel ? 180 : 0 }} transition={{ duration: 0.2 }}>
                 <ChevronDown className="w-4 h-4 text-slate-400" />
               </motion.div>
@@ -128,42 +117,38 @@ export default function EvaluationPage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
                   {/* Decision Tree */}
-                  <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-4">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
                     <div className="flex items-center gap-2.5 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <TreeDeciduous className="w-4 h-4 text-blue-700" />
-                      </div>
+                      <TreeDeciduous className="w-5 h-5 text-slate-800 shrink-0" />
                       <div>
-                        <h3 className="text-xs font-bold text-blue-700">Decision Tree</h3>
+                        <h3 className="text-xs font-bold text-slate-900">Decision Tree</h3>
                         <p className="text-[9px] text-slate-500 font-medium">{dt.description}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {metrics.map((m) => (
-                        <div key={m.key} className="bg-white/70 rounded-lg p-2.5 border border-blue-100/50">
+                        <div key={m.key} className="bg-white rounded-lg p-2.5 border border-slate-200 shadow-xs">
                           <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{m.label}</p>
-                          <p className="text-base font-bold text-blue-700 mt-0.5">{dt[m.key]}%</p>
+                          <p className="text-base font-bold text-slate-900 mt-0.5">{dt[m.key]}%</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Random Forest */}
-                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
                     <div className="flex items-center gap-2.5 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                        <Trees className="w-4 h-4 text-emerald-700" />
-                      </div>
+                      <Trees className="w-5 h-5 text-slate-800 shrink-0" />
                       <div>
-                        <h3 className="text-xs font-bold text-emerald-700">Random Forest</h3>
+                        <h3 className="text-xs font-bold text-slate-900">Random Forest</h3>
                         <p className="text-[9px] text-slate-500 font-medium">{rf.description}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {metrics.map((m) => (
-                        <div key={m.key} className="bg-white/70 rounded-lg p-2.5 border border-emerald-100/50">
+                        <div key={m.key} className="bg-white rounded-lg p-2.5 border border-slate-200 shadow-xs">
                           <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{m.label}</p>
-                          <p className="text-base font-bold text-emerald-700 mt-0.5">{rf[m.key]}%</p>
+                          <p className="text-base font-bold text-slate-900 mt-0.5">{rf[m.key]}%</p>
                         </div>
                       ))}
                     </div>
@@ -192,15 +177,15 @@ export default function EvaluationPage() {
               <thead>
                 <tr className="bg-slate-50/80">
                   <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3.5">Metrik</th>
-                  <th className="text-center text-[11px] font-bold text-blue-600 uppercase tracking-wider px-5 py-3.5">
+                  <th className="text-center text-[11px] font-bold text-slate-700 uppercase tracking-wider px-5 py-3.5">
                     <div className="flex items-center justify-center gap-1.5">
-                      <TreeDeciduous className="w-3.5 h-3.5" />
+                      <TreeDeciduous className="w-3.5 h-3.5 text-slate-700" />
                       Decision Tree
                     </div>
                   </th>
-                  <th className="text-center text-[11px] font-bold text-emerald-600 uppercase tracking-wider px-5 py-3.5">
+                  <th className="text-center text-[11px] font-bold text-slate-700 uppercase tracking-wider px-5 py-3.5">
                     <div className="flex items-center justify-center gap-1.5">
-                      <Trees className="w-3.5 h-3.5" />
+                      <Trees className="w-3.5 h-3.5 text-slate-700" />
                       Random Forest
                     </div>
                   </th>
@@ -214,7 +199,6 @@ export default function EvaluationPage() {
                   const rfVal = rf[metric.key];
                   const diff = Math.abs(rfVal - dtVal).toFixed(1);
                   const winner = rfVal > dtVal ? 'Random Forest' : dtVal > rfVal ? 'Decision Tree' : 'Sama';
-                  const winnerColor = winner === 'Random Forest' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : winner === 'Decision Tree' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-slate-500 bg-slate-50 border-slate-100';
 
                   return (
                     <motion.tr
@@ -234,16 +218,16 @@ export default function EvaluationPage() {
                         </div>
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <span className="text-sm font-bold text-blue-600">{dtVal}%</span>
+                        <span className="text-sm font-bold text-slate-800">{dtVal}%</span>
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <span className="text-sm font-bold text-emerald-600">{rfVal}%</span>
+                        <span className="text-sm font-bold text-slate-800">{rfVal}%</span>
                       </td>
                       <td className="px-5 py-4 text-center">
                         <span className="text-xs font-bold text-slate-600">{diff}%</span>
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${winnerColor}`}>
+                        <span className="text-xs font-semibold text-slate-700">
                           {winner}
                         </span>
                       </td>
@@ -256,11 +240,11 @@ export default function EvaluationPage() {
 
           {/* Summary footer */}
           <div className="p-5 bg-slate-50/50 border-t border-slate-100">
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <Award className="w-4 h-4 text-emerald-500" />
+            <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
+              <Award className="w-4 h-4 text-slate-700" />
               <span>
-                Model <strong className="text-emerald-600">Random Forest</strong> menunjukkan performa lebih unggul di semua metrik evaluasi dengan rata-rata selisih{' '}
-                <strong className="text-emerald-600">
+                Model <strong className="text-slate-900 font-bold">Random Forest</strong> menunjukkan performa lebih unggul di semua metrik evaluasi dengan rata-rata selisih{' '}
+                <strong className="text-slate-900 font-bold">
                   +{(
                     ((rf.accuracy - dt.accuracy) + (rf.precision - dt.precision) + (rf.recall - dt.recall) + (rf.f1Score - dt.f1Score)) / 4
                   ).toFixed(1)}%

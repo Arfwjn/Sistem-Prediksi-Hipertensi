@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\Patient;
 use App\Models\Prediction;
 use App\Models\ModelConfig;
+use App\Models\Notification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,10 +19,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Clear existing database rows for a clean seed (essential for database reset!)
+        Schema::disableForeignKeyConstraints();
         User::truncate();
         Patient::truncate();
         Prediction::truncate();
         ModelConfig::truncate();
+        Notification::truncate();
+        Schema::enableForeignKeyConstraints();
 
         // 2. Create the default Clinician User
         User::create([

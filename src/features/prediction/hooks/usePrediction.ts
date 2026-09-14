@@ -57,6 +57,9 @@ const calculateBmi = (berat: number | '', tinggi: number | ''): number => {
   return 0;
 };
 
+/**
+ * Global Zustand store untuk formulir klasifikasi dan parameter klinis pasien
+ */
 export const usePredictionFormStore = create<PredictionFormState>((set) => ({
   usia: '',
   gender: 'L',
@@ -114,6 +117,10 @@ export const usePredictionFormStore = create<PredictionFormState>((set) => ({
   }),
 }));
 
+/**
+ * Custom Hook untuk mengorkestrasi alur klasifikasi hipertensi,
+ * integrasi data pasien terdaftar vs baru, kalkulasi IMT, dan penyimpanan record.
+ */
 export function usePrediction() {
   const store = usePredictionFormStore();
   const { addRecord } = usePredictionStore();
@@ -330,6 +337,39 @@ export function usePrediction() {
     }
   };
 
+  const selectRegisteredPatient = (patient: Patient) => {
+    const records = usePredictionStore.getState().records;
+    const latestRecord = records.find((r) => r.patientId === patient.id);
+
+    store.setPatientType('registered');
+    store.setSelectedPatientId(patient.id);
+    store.setPatientName(patient.name);
+
+    // Usia: prefer latest recorded age or patient profile age
+    const ageToSet = latestRecord?.age ?? patient.age;
+    store.setUsia(ageToSet);
+
+    // Gender: prefer latest recorded gender or patient profile gender
+    const genderToSet = latestRecord?.gender ?? patient.gender;
+    store.setGender(genderToSet);
+
+    // Berat & Tinggi: auto-fill from previous history
+    if (latestRecord && latestRecord.weight && latestRecord.height) {
+      store.setBerat(latestRecord.weight);
+      store.setTinggi(latestRecord.height);
+    }
+
+    // Sistolik & Diastolik: auto-fill from latest record or bpHistory
+    if (latestRecord && latestRecord.systolic && latestRecord.diastolic) {
+      store.setSistolik(latestRecord.systolic);
+      store.setDiastolik(latestRecord.diastolic);
+    } else if (patient.bpHistory && patient.bpHistory.length > 0) {
+      const lastBp = patient.bpHistory[patient.bpHistory.length - 1];
+      store.setSistolik(lastBp.systolic);
+      store.setDiastolik(lastBp.diastolic);
+    }
+  };
+
   // Helper utility
   const minMax = (maxVal: number, val: number) => {
     return Math.min(maxVal, val);
@@ -359,6 +399,8 @@ export function usePrediction() {
     setPatientName: store.setPatientName,
     setIsSaved: store.setIsSaved,
 
+    selectRegisteredPatient,
+
     currentResult: store.currentResult,
     currentConfidence: store.currentConfidence,
     accuracyDT: store.accuracyDT,
@@ -369,5 +411,6 @@ export function usePrediction() {
     handleReset: store.resetForm,
   };
 }
+
 
 

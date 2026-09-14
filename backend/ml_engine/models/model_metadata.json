@@ -1,0 +1,36 @@
+{
+  "scenario": "Skenario 1 - Clinical Staging Model",
+  "target_classes": {
+    "0": "Normal",
+    "1": "Pra Hipertensi",
+    "2": "Tingkat 1",
+    "3": "Tingkat 2"
+  },
+  "features": [
+    "Umur",
+    "JK_Code",
+    "Kategori_Usia_Code",
+    "Berat Badan (kg)",
+    "Tinggi Badan (cm)",
+    "IMT",
+    "Sistole",
+    "Diastole"
+  ],
+  "metrics": {
+    "decision_tree": {
+      "accuracy": 100.0,
+      "f1_score": 100.0,
+      "precision": 100.0,
+      "recall": 100.0
+    },
+    "random_forest": {
+      "accuracy": 99.97,
+      "f1_score": 99.98,
+      "precision": 99.98,
+      "recall": 99.98
+    }
+  },
+  "train_samples_post_smote": 20420,
+  "test_samples": 3723,
+  "dataset_source": "DATASET_SKRIPSI_GABUNGAN_CLEAN.xlsx"
+}

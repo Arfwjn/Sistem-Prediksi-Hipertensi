@@ -5,30 +5,6 @@ import { Mail, ArrowRight, ShieldCheck, KeyRound, Lock, Eye, EyeOff, CheckCircle
 import { Button } from '../components/ui/Button';
 import api from '../services/api';
 
-// Animated floating particle component
-function FloatingParticle({ delay, size, x, y, duration }: { delay: number; size: number; x: string; y: string; duration: number }) {
-  return (
-    <motion.div
-      className="absolute rounded-full bg-amber-400/12 pointer-events-none"
-      style={{ width: size, height: size, left: x, top: y }}
-      animate={{
-        y: [0, -20, 0],
-        x: [0, 10, 0],
-        opacity: [0.2, 0.5, 0.2],
-        scale: [1, 1.1, 1],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        delay,
-        ease: 'easeInOut',
-      }}
-    />
-  );
-}
-
-type Step = 'request' | 'reset' | 'done';
-
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<Step>('request');
   const [email, setEmail] = useState('');
@@ -102,43 +78,19 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 flex items-center justify-center p-4 font-sans antialiased selection:bg-amber-500 selection:text-white relative overflow-hidden">
-      {/* Animated background particles */}
-      <FloatingParticle delay={0} size={75} x="12%" y="22%" duration={7} />
-      <FloatingParticle delay={1} size={50} x="82%" y="18%" duration={6.5} />
-      <FloatingParticle delay={2.5} size={85} x="68%" y="72%" duration={8} />
-      <FloatingParticle delay={0.6} size={40} x="22%" y="78%" duration={9} />
-      <FloatingParticle delay={1.5} size={55} x="48%" y="6%" duration={5.5} />
-
-      {/* Subtle radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-200/15 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans antialiased selection:bg-blue-600 selection:text-white relative">
       {/* Main card */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-[420px] relative z-10"
-      >
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-8 md:p-10">
+      <div className="w-full max-w-[420px] relative z-10">
+        <div className="bg-white rounded-2xl border border-slate-200 border-b-4 shadow-sm p-8 md:p-10">
 
           {/* Logo and header */}
           <div className="text-center mb-7">
-            <motion.div
-              whileHover={{ scale: 1.08, rotate: 3 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-14 h-14 mx-auto mb-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center cursor-pointer overflow-hidden"
-            >
+            <div className="w-14 h-14 mx-auto mb-4 bg-white rounded-xl border border-slate-200 border-b-2 shadow-xs flex items-center justify-center overflow-hidden">
               <img src="/logo_banyumas.png" alt="Logo" className="w-10 h-10 object-contain" />
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="text-2xl font-bold text-slate-900 tracking-tight"
-            >
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               {step === 'done' ? 'Password Berhasil Direset' : 'Lupa Password'}
-            </motion.h1>
+            </h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -310,8 +262,8 @@ export default function ForgotPasswordPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-4"
             >
-              <div className="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100">
-                <CheckCircle className="w-8 h-8 text-emerald-500" />
+              <div className="w-16 h-16 mx-auto mb-4 bg-emerald-600 text-white rounded-xl flex items-center justify-center border border-emerald-700 border-b-2 shadow-xs">
+                <CheckCircle className="w-8 h-8 text-white" />
               </div>
               <p className="text-sm text-slate-600 font-medium mb-5">
                 Password Anda berhasil direset. Silakan login dengan password baru.
@@ -355,15 +307,10 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Bottom brand tag */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none"
-        >
+        <p className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none">
           Klasifikasi Hipertensi Puskesmas Kembaran 1 &copy; {new Date().getFullYear()}
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 }

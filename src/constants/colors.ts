@@ -1,27 +1,31 @@
 export const HYPERTENSION_COLORS = {
   Normal: {
-    bg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    text: 'text-emerald-700',
-    primary: '#10b981', // emerald-500
-    primaryLight: 'rgba(16, 185, 129, 0.1)',
+    bg: 'bg-slate-50 text-slate-800 border-slate-200',
+    dot: 'bg-emerald-600',
+    text: 'text-slate-800',
+    primary: '#059669',
+    primaryLight: 'rgba(5, 150, 105, 0.08)',
   },
   'Pra Hipertensi': {
-    bg: 'bg-amber-50 text-amber-700 border-amber-200',
-    text: 'text-amber-700',
-    primary: '#f59e0b', // amber-500
-    primaryLight: 'rgba(245, 158, 11, 0.1)',
+    bg: 'bg-slate-50 text-slate-800 border-slate-200',
+    dot: 'bg-amber-600',
+    text: 'text-slate-800',
+    primary: '#d97706',
+    primaryLight: 'rgba(217, 119, 6, 0.08)',
   },
   'Tingkat 1': {
-    bg: 'bg-orange-50 text-orange-700 border-orange-200',
-    text: 'text-orange-700',
-    primary: '#f97316', // orange-500
-    primaryLight: 'rgba(249, 115, 22, 0.1)',
+    bg: 'bg-slate-50 text-slate-800 border-slate-200',
+    dot: 'bg-orange-600',
+    text: 'text-slate-800',
+    primary: '#ea580c',
+    primaryLight: 'rgba(234, 88, 12, 0.08)',
   },
   'Tingkat 2': {
-    bg: 'bg-rose-50 text-rose-700 border-rose-200',
-    text: 'text-rose-700',
-    primary: '#ef4444', // rose-500 or red-500
-    primaryLight: 'rgba(239, 68, 68, 0.1)',
+    bg: 'bg-slate-50 text-slate-800 border-slate-200',
+    dot: 'bg-red-600',
+    text: 'text-slate-800',
+    primary: '#dc2626',
+    primaryLight: 'rgba(220, 38, 38, 0.08)',
   },
 } as const;
 

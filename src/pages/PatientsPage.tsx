@@ -1,7 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, UserPlus, SlidersHorizontal, SortAsc, Trash2, Eye, X, Phone, Mail, MapPin, Calendar, HeartPulse } from 'lucide-react';
+import { 
+  Search, UserPlus, SlidersHorizontal, SortAsc, Trash2, Eye, Pencil, 
+  X, Phone, Mail, MapPin, Calendar, HeartPulse, ChevronLeft, ChevronRight,
+  Activity, CheckCircle2
+} from 'lucide-react';
 import { usePatients } from '../features/patients/hooks/usePatients';
 import { Patient } from '../types';
 import { Badge } from '../components/ui/Badge';
@@ -10,16 +14,25 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { formatDate } from '../utils/format';
+import PatientBPTrendChart from '../features/patients/components/PatientBPTrendChart';
 
 export default function PatientsPage() {
   const navigate = useNavigate();
   const {
     filterText,
     setFilterText,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    itemsPerPage,
+    paginated,
+    filtered,
+    patients,
+
+    // Add Patient
     isAddOpen,
     setIsAddOpen,
-    selectedPatient,
-    setSelectedPatient,
     newName,
     setNewName,
     newAge,
@@ -34,9 +47,32 @@ export default function PatientsPage() {
     setNewAddress,
     newStatus,
     setNewStatus,
-    filtered,
-    patients,
     handleCreatePatient,
+
+    // Edit Patient
+    isEditOpen,
+    setIsEditOpen,
+    editingPatient,
+    editName,
+    setEditName,
+    editAge,
+    setEditAge,
+    editGender,
+    setEditGender,
+    editPhone,
+    setEditPhone,
+    editEmail,
+    setEditEmail,
+    editAddress,
+    setEditAddress,
+    editStatus,
+    setEditStatus,
+    handleOpenEdit,
+    handleUpdatePatient,
+
+    // Detail & Delete
+    selectedPatient,
+    setSelectedPatient,
     handleDeletePatient,
   } = usePatients();
 
@@ -46,49 +82,36 @@ export default function PatientsPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-4 select-none">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 text-left">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Manajemen Data Pasien</h1>
-          <p className="text-sm font-semibold text-slate-400 mt-1">Kelola informasi klinis, profil, dan rekam riwayat pasien secara terpusat.</p>
-        </div>
-        <Button
-          onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2"
-        >
-          <UserPlus className="w-4.5 h-4.5" />
-          <span>Tambah Pasien Baru</span>
-        </Button>
-      </div>
-
-      {/* Toolbar searchable and ordering filters */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-[0_4px_25px_rgba(0,0,0,0.02)] flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative">
+      {/* Toolbar searchable and filters */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-[0_4px_25px_rgba(0,0,0,0.02)] flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div className="flex-1 relative w-full md:max-w-md">
           <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <Search className="w-4.5 h-4.5" />
           </span>
           <input
             type="text"
-            placeholder="Cari Nama atau ID Pasien..."
+            placeholder="Cari Nama, ID, Telepon, atau Alamat..."
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100/80 transition-all font-sans focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100/80 transition-all font-sans"
           />
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
-          <button className="flex-1 md:flex-initial bg-slate-50 border border-slate-200 hover:bg-slate-100/85 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer">
-            <SlidersHorizontal className="w-4 h-4 text-slate-400" />
-            <span>Filter</span>
-          </button>
-          <button className="flex-1 md:flex-initial bg-slate-50 border border-slate-200 hover:bg-slate-100/85 text-slate-600 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer">
-            <SortAsc className="w-4 h-4 text-slate-400" />
-            <span>Urutkan</span>
-          </button>
+        <div className="flex gap-2 w-full md:w-auto justify-end">
+          <span className="text-[10px] font-bold text-slate-700 bg-slate-100 border border-slate-300 px-3 py-2 tracking-wider rounded-lg shadow-xs uppercase whitespace-nowrap self-center">
+            {filtered.length} Pasien Terdaftar
+          </span>
+          <Button
+            onClick={() => setIsAddOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <UserPlus className="w-4.5 h-4.5" />
+            <span>Tambah Pasien Baru</span>
+          </Button>
         </div>
       </div>
 
       {/* Main Patient Data Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.02)] flex flex-col">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead className="bg-[#f8fafc]/80 border-b border-slate-200 font-bold text-[10px] text-slate-400 uppercase tracking-widest select-none">
@@ -97,6 +120,7 @@ export default function PatientsPage() {
                 <th className="py-3.5 px-6">Nama Lengkap</th>
                 <th className="py-3.5 px-6">Usia</th>
                 <th className="py-3.5 px-6">Jenis Kelamin</th>
+                <th className="py-3.5 px-6">Kontak / Alamat</th>
                 <th className="py-3.5 px-6">Cek Terakhir</th>
                 <th className="py-3.5 px-6">Status Terakhir</th>
                 <th className="py-3.5 px-6 text-right">Aksi</th>
@@ -104,8 +128,8 @@ export default function PatientsPage() {
             </thead>
             
             <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700 bg-white">
-              {filtered.length > 0 ? (
-                filtered.map((pat) => {
+              {paginated.length > 0 ? (
+                paginated.map((pat) => {
                   const initial = pat.name
                     .split(' ')
                     .map((n) => n[0])
@@ -118,17 +142,27 @@ export default function PatientsPage() {
                       key={pat.id}
                       className="hover:bg-slate-50/50 transition-colors group"
                     >
-                      <td className="py-4.5 px-6 font-bold text-blue-700 select-text">{pat.id}</td>
+                      <td className="py-4.5 px-6 font-bold text-slate-800 select-text">{pat.id}</td>
                       <td className="py-4.5 px-6 select-text">
                         <div className="flex items-center gap-3">
-                          <div className="w-8.5 h-8.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-bold text-xs shadow-inner select-none">
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center font-bold text-xs select-none shrink-0">
                             {initial}
                           </div>
-                          <span className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{pat.name}</span>
+                          <span className="font-bold text-slate-900">{pat.name}</span>
                         </div>
                       </td>
                       <td className="py-4.5 px-6 text-slate-600">{pat.age} Tahun</td>
                       <td className="py-4.5 px-6 text-slate-500">{pat.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+                      <td className="py-4.5 px-6 text-slate-500 max-w-[180px] truncate select-text">
+                        {pat.phone || pat.address ? (
+                          <div className="space-y-0.5">
+                            {pat.phone && <span className="block text-[11px] font-bold text-slate-700">{pat.phone}</span>}
+                            {pat.address && <span className="block text-[10px] text-slate-400 truncate">{pat.address}</span>}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-350 italic">Belum dilengkapi</span>
+                        )}
+                      </td>
                       <td className="py-4.5 px-6 text-slate-450 select-text">
                         {formatDate(pat.lastChecked)}
                       </td>
@@ -136,26 +170,33 @@ export default function PatientsPage() {
                         <Badge variant={pat.status}>{pat.status}</Badge>
                       </td>
                       
-                      {/* Interactive hover actions row slider */}
+                      {/* Action buttons */}
                       <td className="py-4.5 px-6 text-right select-none">
-                        <div className="flex justify-end gap-1 px-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                        <div className="flex justify-end gap-1.5 px-1">
                           <button
                             onClick={() => handleShortcutPredict(pat)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-blue-700 hover:bg-blue-50 border border-slate-200 transition-all cursor-pointer bg-white"
                             title="Mulai Klasifikasi Hipertensi"
                           >
                             <HeartPulse className="w-4 h-4" />
                           </button>
                           <button
+                            onClick={() => handleOpenEdit(pat)}
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer bg-white"
+                            title="Edit Data & Kontak Pasien"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => setSelectedPatient(pat)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-650 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all cursor-pointer"
-                            title="Detail Rekam Medis"
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer bg-white"
+                            title="Detail Rekam Medis & Grafik Tensi"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeletePatient(pat.id)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-all cursor-pointer bg-white"
                             title="Hapus Pasien"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -167,8 +208,16 @@ export default function PatientsPage() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400">
-                    <div className="py-6 font-bold select-none">Tidak ada pasien yang cocok dengan pencarian Anda.</div>
+                  <td colSpan={8} className="text-center py-16 text-slate-400">
+                    <div className="flex flex-col items-center justify-center max-w-[280px] mx-auto py-4">
+                      <div className="p-4 bg-slate-100 rounded-xl border border-slate-200 border-b-2 shadow-xs mb-3">
+                        <Activity className="w-8 h-8 text-slate-600" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Tidak Ada Data Ditemukan</h4>
+                      <p className="text-xs text-slate-400 text-center mt-1 leading-relaxed font-semibold">
+                        Tidak ada pasien yang cocok dengan kata kunci pencarian "{filterText}".
+                      </p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -176,13 +225,59 @@ export default function PatientsPage() {
           </table>
         </div>
 
-        {/* Minimal pagination reports status */}
-        <div className="p-4 border-t border-slate-100 bg-[#f8fafc]/50 flex items-center justify-between text-xs font-semibold text-slate-400 select-none">
-          <p>Menampilkan <span className="font-bold text-slate-800">{filtered.length}</span> dari <span className="font-bold text-slate-800">{patients.length}</span> pasien terdaftar</p>
-        </div>
+        {/* Dynamic Pagination toolbar (Identik dengan HistoryPage) */}
+        {totalPages > 1 && (
+          <div className="p-4 border-t border-slate-150 bg-[#f8fafc]/50 flex items-center justify-between select-none">
+            <p className="text-xs font-semibold text-slate-450">
+              Menampilkan <span className="font-bold text-slate-800">{startIndex + 1}</span> hingga{' '}
+              <span className="font-bold text-slate-800">
+                {Math.min(startIndex + itemsPerPage, filtered.length)}
+              </span>{' '}
+              dari <span className="font-bold text-slate-800">{filtered.length}</span> pasien terdaftar
+            </p>
+            <div className="flex gap-1">
+              <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((c) => Math.max(1, c - 1))}
+                className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              {/* Pagination indexes */}
+              {Array.from({ length: totalPages }).map((_, i) => {
+                const pageIndex = i + 1;
+                const isSelected = currentPage === pageIndex;
+                return (
+                  <button
+                    key={`pat-pg-idx-${pageIndex}`}
+                    onClick={() => setCurrentPage(pageIndex)}
+                    className={`w-8 h-8 rounded-lg font-bold text-xs transition-colors cursor-pointer
+                      ${isSelected 
+                        ? 'bg-blue-600 text-white shadow-sm border-blue-600' 
+                        : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-600'
+                      }`}
+                  >
+                    {pageIndex}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((c) => Math.min(totalPages, c + 1))}
+                className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* OVERLAY MODULE: PATIENT DETAILS DETAIL POPUP (Modal UI Component) */}
+      {/* OVERLAY MODULE: PATIENT DETAILS DETAIL POPUP DENGAN GRAFIK TENSI */}
       <Modal
         isOpen={!!selectedPatient}
         onClose={() => setSelectedPatient(null)}
@@ -190,110 +285,211 @@ export default function PatientsPage() {
         size="lg"
       >
         {selectedPatient && (
-          <div className="flex flex-col text-left">
+          <div className="flex flex-col text-left space-y-6">
             {/* Header Details */}
-            <div className="flex gap-4 items-center pb-4 border-b border-slate-100">
-              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-lg">
-                {selectedPatient.name.split(' ').map((n)=>n[0]).join('').slice(0, 2).toUpperCase()}
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex gap-4 items-center">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-900 border border-slate-200 flex items-center justify-center font-bold text-base">
+                  {selectedPatient.name.split(' ').map((n)=>n[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 tracking-tight leading-snug">{selectedPatient.name}</h3>
+                  <p className="text-xs text-slate-450 font-bold uppercase tracking-wider mt-0.5">{selectedPatient.id}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-extrabold text-slate-900 tracking-tight leading-snug">{selectedPatient.name}</h3>
-                <p className="text-xs text-slate-450 font-bold uppercase tracking-wider mt-0.5">{selectedPatient.id}</p>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const pat = selectedPatient;
+                  setSelectedPatient(null);
+                  handleOpenEdit(pat);
+                }}
+                className="flex items-center gap-1.5"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Edit Informasi</span>
+              </Button>
             </div>
 
-            {/* Informative Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 overflow-y-auto max-h-[50vh] pr-1">
-              {/* Contact clinical lists */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest select-none">Kontak & Demografis</h4>
-                <ul className="space-y-3 pl-0 list-none">
-                  <li className="flex gap-3 text-xs font-semibold text-slate-700">
-                    <Phone className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-400 font-medium block">Telepon</span>
-                      <span className="mt-0.5 block select-text">{selectedPatient.phone}</span>
-                    </div>
+            {/* Informative Demographics & Status Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Contact Information */}
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Kontak & Demografis</h4>
+                <ul className="space-y-2.5 pl-0 list-none text-xs">
+                  <li className="flex items-center gap-2.5 font-semibold text-slate-700">
+                    <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{selectedPatient.phone || <em className="text-slate-400 font-normal">Nomor belum diisi</em>}</span>
                   </li>
-                  <li className="flex gap-3 text-xs font-semibold text-slate-700">
-                    <Mail className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-400 font-medium block">E-mail</span>
-                      <span className="mt-0.5 block select-text">{selectedPatient.email}</span>
-                    </div>
+                  <li className="flex items-center gap-2.5 font-semibold text-slate-700">
+                    <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>{selectedPatient.email || <em className="text-slate-400 font-normal">Email belum diisi</em>}</span>
                   </li>
-                  <li className="flex gap-3 text-xs font-semibold text-slate-700">
-                    <MapPin className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-400 font-medium block">Alamat</span>
-                      <span className="mt-0.5 block leading-relaxed select-text">{selectedPatient.address}</span>
-                    </div>
+                  <li className="flex items-start gap-2.5 font-semibold text-slate-700">
+                    <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <span className="leading-snug">{selectedPatient.address || <em className="text-slate-400 font-normal">Alamat belum diisi</em>}</span>
                   </li>
                 </ul>
               </div>
 
-              {/* Patient status details */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest select-none">Metrik Diagnosis Terakhir</h4>
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-150 relative">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold text-slate-550">Kondisi Klinis</span>
-                    <Badge variant={selectedPatient.status}>{selectedPatient.status}</Badge>
+              {/* Diagnosis Status */}
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Diagnosis Terakhir</h4>
+                  <Badge variant={selectedPatient.status}>{selectedPatient.status}</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Usia</span>
+                    <p className="font-extrabold text-base text-slate-800 mt-0.5">{selectedPatient.age} Tahun</p>
                   </div>
-
-                  <div className="flex gap-4 mt-4">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400">Usia</span>
-                      <p className="font-bold text-base text-slate-800 mt-0.5">{selectedPatient.age} Tahun</p>
-                    </div>
-                    <div className="border-l border-slate-200 pl-4">
-                      <span className="text-[10px] font-bold text-slate-400">Gender</span>
-                      <p className="font-bold text-base text-slate-800 mt-0.5">
-                        {selectedPatient.gender === 'L' ? 'Laki-laki' : 'Perempuan'}
-                      </p>
-                    </div>
+                  <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Jenis Kelamin</span>
+                    <p className="font-extrabold text-base text-slate-800 mt-0.5">
+                      {selectedPatient.gender === 'L' ? 'Laki-laki' : 'Perempuan'}
+                    </p>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Historial trends tracking chart */}
-              <div className="md:col-span-2 space-y-4">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest select-none">Tren Rekor History Tekanan Darah</h4>
-                {selectedPatient.bpHistory && selectedPatient.bpHistory.length > 0 ? (
-                  <div className="bg-blue-50/20 p-4 border border-blue-100 rounded-2xl">
-                    <div className="flex justify-around items-center gap-2 select-none">
-                      {selectedPatient.bpHistory.map((item, idx) => (
-                        <div key={`${selectedPatient.id}-history-pt-${idx}`} className="text-center">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase">{item.date}</span>
-                          <div className="mt-1.5 flex gap-1 font-bold text-[14px]">
-                            <span className="text-blue-600">{item.systolic}</span>
-                            <span className="text-slate-300">/</span>
-                            <span className="text-indigo-500">{item.diastolic}</span>
-                          </div>
-                          <span className="text-[9px] font-medium text-slate-400 block tracking-wide mt-1">mmHg</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center p-6 bg-slate-50 rounded-2xl text-slate-400 font-semibold select-none text-xs">
-                    Tidak ada tren historical BP terekam untuk pasien ini.
-                  </div>
-                )}
-              </div>
+            {/* Visual Interactive BP Trend Chart */}
+            <div className="pt-2">
+              <PatientBPTrendChart 
+                bpHistory={selectedPatient.bpHistory} 
+                patientName={selectedPatient.name} 
+              />
             </div>
 
             {/* Footer buttons */}
-            <div className="border-t border-slate-100 pt-4 flex justify-end">
+            <div className="border-t border-slate-100 pt-4 flex justify-between items-center">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const pat = selectedPatient;
+                  setSelectedPatient(null);
+                  handleShortcutPredict(pat);
+                }}
+                className="flex items-center gap-1.5 text-xs"
+              >
+                <HeartPulse className="w-4 h-4 text-blue-600" />
+                <span>Mulai Klasifikasi Pasien Ini</span>
+              </Button>
               <Button
                 onClick={() => setSelectedPatient(null)}
                 variant="secondary"
               >
-                Tutup Rincian
+                Tutup
               </Button>
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* OVERLAY MODULE: EDIT INFORMASI PASIEN MODAL */}
+      <Modal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        title="Edit Informasi Pasien"
+      >
+        <form onSubmit={handleUpdatePatient} className="space-y-4 text-left max-h-[65vh] overflow-y-auto pr-1">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex justify-between items-center mb-2">
+            <span className="text-xs font-bold text-slate-500">ID Pasien:</span>
+            <span className="text-xs font-extrabold text-slate-800">{editingPatient?.id}</span>
+          </div>
+
+          {/* Nama Lengkap */}
+          <Input
+            label="Nama Lengkap Pasien"
+            required
+            placeholder="Contoh: Budi Santoso"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+
+          {/* Usia & Gender */}
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Usia (Tahun)"
+              type="number"
+              required
+              min={1}
+              max={120}
+              placeholder="Contoh: 45"
+              value={editAge}
+              onChange={(e) => setEditAge(e.target.value === '' ? '' : Number(e.target.value))}
+            />
+            <Select
+              label="Jenis Kelamin"
+              value={editGender}
+              onChange={(e) => setEditGender(e.target.value as 'L' | 'P')}
+              options={[
+                { value: 'L', label: 'Laki-laki' },
+                { value: 'P', label: 'Perempuan' }
+              ]}
+            />
+          </div>
+
+          {/* Kontak: Telepon & Email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Nomor Telepon / WhatsApp"
+              placeholder="Contoh: 081234567890"
+              value={editPhone}
+              onChange={(e) => setEditPhone(e.target.value)}
+            />
+            <Input
+              label="Alamat E-mail"
+              type="email"
+              placeholder="Contoh: pasien@gmail.com"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+            />
+          </div>
+
+          {/* Alamat Lengkap */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 tracking-wide block">Alamat Domisili</label>
+            <textarea
+              rows={3}
+              placeholder="Contoh: RT 02/RW 03 Desa Linggasari, Kec. Kembaran"
+              value={editAddress}
+              onChange={(e) => setEditAddress(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100/80 transition-all resize-none"
+            />
+          </div>
+
+          {/* Status Diagnosis */}
+          <Select
+            label="Kategori / Status Klinis"
+            value={editStatus}
+            onChange={(e) => setEditStatus(e.target.value as Patient['status'])}
+            options={[
+              { value: 'Normal', label: 'Normal' },
+              { value: 'Pra Hipertensi', label: 'Pra Hipertensi' },
+              { value: 'Tingkat 1', label: 'Tingkat 1' },
+              { value: 'Tingkat 2', label: 'Tingkat 2' }
+            ]}
+          />
+
+          {/* Action buttons */}
+          <div className="border-t border-slate-100 pt-4 flex gap-3 justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsEditOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+            >
+              Simpan Perubahan
+            </Button>
+          </div>
+        </form>
       </Modal>
 
       {/* OVERLAY MODULE: TAMBAH PASIEN BARU FORM MODAL */}
@@ -303,93 +499,88 @@ export default function PatientsPage() {
         title="Tambah Pasien Baru"
       >
         <form onSubmit={handleCreatePatient} className="space-y-4 text-left max-h-[60vh] overflow-y-auto pr-1">
-          {/* Nama Pasien */}
           <Input
             label="Nama Lengkap"
             required
-            placeholder="Contoh: Andi Wijaya"
+            placeholder="Contoh: Budi Santoso"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
           />
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Usia */}
             <Input
-              type="number"
               label="Usia (Tahun)"
+              type="number"
               required
-              placeholder="Contoh: 40"
+              min={1}
+              max={120}
+              placeholder="Contoh: 45"
               value={newAge}
               onChange={(e) => setNewAge(e.target.value === '' ? '' : Number(e.target.value))}
             />
-
-            {/* Gender */}
             <Select
               label="Jenis Kelamin"
               value={newGender}
               onChange={(e) => setNewGender(e.target.value as 'L' | 'P')}
               options={[
                 { value: 'L', label: 'Laki-laki' },
-                { value: 'P', label: 'Perempuan' },
+                { value: 'P', label: 'Perempuan' }
               ]}
             />
           </div>
 
-          {/* Telepon */}
-          <Input
-            label="Nomor Telepon"
-            placeholder="Contoh: 0812-xxxx-xxxx"
-            value={newPhone}
-            onChange={(e) => setNewPhone(e.target.value)}
-          />
-
-          {/* Email */}
-          <Input
-            type="email"
-            label="E-mail"
-            placeholder="Contoh: andi@gmail.com"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-          />
-
-          {/* Alamat */}
-          <div className="space-y-1.5 flex flex-col">
-            <label className="text-xs font-semibold text-slate-655 tracking-wide uppercase">Alamat Lengkap</label>
-            <textarea
-              rows={2}
-              placeholder="Contoh: Jl. Diponegoro No. 12"
-              value={newAddress}
-              onChange={(e) => setNewAddress(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all font-sans"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Nomor Telepon"
+              placeholder="Contoh: 081234567890"
+              value={newPhone}
+              onChange={(e) => setNewPhone(e.target.value)}
+            />
+            <Input
+              label="E-mail"
+              type="email"
+              placeholder="Contoh: pasien@gmail.com"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
             />
           </div>
 
-          {/* Status Terakhir */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 tracking-wide block">Alamat</label>
+            <textarea
+              rows={2}
+              placeholder="Contoh: RT 01/RW 02 Desa Linggasari, Kec. Kembaran"
+              value={newAddress}
+              onChange={(e) => setNewAddress(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100/80 transition-all resize-none"
+            />
+          </div>
+
           <Select
-            label="Staging Terakhir"
+            label="Status Diagnosa Awal"
             value={newStatus}
             onChange={(e) => setNewStatus(e.target.value as Patient['status'])}
             options={[
               { value: 'Normal', label: 'Normal' },
               { value: 'Pra Hipertensi', label: 'Pra Hipertensi' },
-              { value: 'Tingkat 1', label: 'Hipertensi Tingkat 1' },
-              { value: 'Tingkat 2', label: 'Hipertensi Tingkat 2' },
+              { value: 'Tingkat 1', label: 'Tingkat 1' },
+              { value: 'Tingkat 2', label: 'Tingkat 2' }
             ]}
           />
 
-          <div className="flex gap-3 pt-4 border-t border-slate-100 select-none">
-            <Button
-              type="submit"
-              className="flex-grow py-3.5"
-            >
-              Simpan Data Pasien
-            </Button>
+          <div className="border-t border-slate-100 pt-4 flex gap-3 justify-end">
             <Button
               type="button"
               variant="outline"
               onClick={() => setIsAddOpen(false)}
             >
-              Kembali
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+            >
+              Simpan Pasien
             </Button>
           </div>
         </form>

@@ -23,30 +23,30 @@ interface EmptyStateProps {
 
 const ICON_VARIANTS = {
   left: {
-    initial: { scale: 0.8, opacity: 0, x: 0, y: 0, rotate: 0 },
-    animate: { scale: 1, opacity: 1, x: 0, y: 0, rotate: -6, transition: { duration: 0.4, delay: 0.1 } },
-    hover: { x: -22, y: -5, rotate: -15, scale: 1.1, transition: { duration: 0.2 } }
+    initial: { opacity: 0, y: 4 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+    hover: { y: -2, transition: { duration: 0.15 } }
   },
   center: {
-    initial: { scale: 0.8, opacity: 0 },
-    animate: { scale: 1, opacity: 1, transition: { duration: 0.4, delay: 0.2 } },
-    hover: { y: -10, scale: 1.15, transition: { duration: 0.2 } }
+    initial: { opacity: 0, y: 4 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+    hover: { y: -3, transition: { duration: 0.15 } }
   },
   right: {
-    initial: { scale: 0.8, opacity: 0, x: 0, y: 0, rotate: 0 },
-    animate: { scale: 1, opacity: 1, x: 0, y: 0, rotate: 6, transition: { duration: 0.4, delay: 0.3 } },
-    hover: { x: 22, y: -5, rotate: 15, scale: 1.1, transition: { duration: 0.2 } }
+    initial: { opacity: 0, y: 4 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+    hover: { y: -2, transition: { duration: 0.15 } }
   }
 };
 
 const CONTENT_VARIANTS = {
-  initial: { y: 20, opacity: 0 },
-  animate: { y: 0, opacity: 1, transition: { duration: 0.4, delay: 0.2 } },
+  initial: { y: 10, opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { duration: 0.25 } },
 };
 
 const BUTTON_VARIANTS = {
-  initial: { y: 20, opacity: 0 },
-  animate: { y: 0, opacity: 1, transition: { duration: 0.4, delay: 0.3 } },
+  initial: { y: 10, opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { duration: 0.25 } },
 };
 
 interface IconContainerProps {
@@ -60,19 +60,14 @@ const IconContainer = memo(({ children, variant, className = '', theme }: IconCo
   <motion.div
     variants={ICON_VARIANTS[variant]}
     className={cn(
-      "w-12 h-12 rounded-xl flex items-center justify-center relative shadow-lg transition-all duration-300",
-      theme === 'dark' && "bg-neutral-800 border border-neutral-700 group-hover:shadow-xl group-hover:border-neutral-600",
-      theme === 'neutral' && "bg-stone-100 border border-stone-200 group-hover:shadow-xl group-hover:border-stone-300",
-      (!theme || theme === 'light') && "bg-white border border-gray-200 group-hover:shadow-xl group-hover:border-gray-300",
+      "w-11 h-11 rounded-lg flex items-center justify-center relative shadow-xs border border-b-2 transition-all duration-150",
+      theme === 'dark' && "bg-neutral-800 border-neutral-700 text-neutral-200",
+      theme === 'neutral' && "bg-slate-100 border-slate-300 text-slate-700",
+      (!theme || theme === 'light') && "bg-slate-100 border-slate-300 text-slate-700",
       className
     )}
   >
-    <div className={cn(
-      "text-sm transition-colors duration-300",
-      theme === 'dark' && "text-neutral-400 group-hover:text-neutral-200",
-      theme === 'neutral' && "text-stone-500 group-hover:text-stone-700",
-      (!theme || theme === 'light') && "text-gray-500 group-hover:text-gray-700"
-    )}>
+    <div className="text-sm shrink-0">
       {children}
     </div>
   </motion.div>
@@ -84,35 +79,18 @@ interface MultiIconDisplayProps {
   theme?: 'light' | 'dark' | 'neutral';
 }
 
-const MultiIconDisplay = memo(({ icons, theme }: MultiIconDisplayProps) => {
-  if (!icons || icons.length < 3) return null;
+const MultiIconDisplay = memo(({ icons }: MultiIconDisplayProps) => {
+  if (!icons || icons.length === 0) return null;
 
   return (
-    <div className="flex justify-center isolate relative">
-      <IconContainer variant="left" className="left-2 top-1 z-10" theme={theme}>
-        {icons[0]}
-      </IconContainer>
-      <IconContainer variant="center" className="z-20" theme={theme}>
-        {icons[1]}
-      </IconContainer>
-      <IconContainer variant="right" className="right-2 top-1 z-10" theme={theme}>
-        {icons[2]}
-      </IconContainer>
+    <div className="flex justify-center items-center text-slate-800">
+      {icons[0]}
     </div>
   );
 });
 MultiIconDisplay.displayName = "MultiIconDisplay";
 
-const Background = ({ theme }: { theme?: 'light' | 'dark' | 'neutral' }) => (
-  <div
-    aria-hidden="true"
-    className="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity duration-500"
-    style={{
-      backgroundImage: `radial-gradient(circle at 2px 2px, #fff 1px, transparent 1px)`,
-      backgroundSize: '24px 24px'
-    }}
-  />
-);
+const Background = () => null;
 
 export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(({
   title,
@@ -261,12 +239,9 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(({
                 whileTap={{ scale: 0.98 }}
               >
                 {action.icon && (
-                  <motion.div
-                    className="transition-transform group-hover/button:rotate-90"
-                    whileHover={{ rotate: 90 }}
-                  >
+                  <div className="shrink-0">
                     {action.icon}
-                  </motion.div>
+                  </div>
                 )}
                 <span className="relative z-10">{action.label}</span>
               </motion.button>

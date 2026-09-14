@@ -17,6 +17,11 @@ export const settingsService = {
     return response.data;
   },
 
+  changePassword: async (passwords: { current_password: string; new_password: string; new_password_confirmation: string }) => {
+    const response = await api.put<{ message: string }>('/profile/change-password', passwords);
+    return response.data;
+  },
+
   resetDatabase: async () => {
     const response = await api.post<{ message: string }>('/database/reset');
     return response.data;

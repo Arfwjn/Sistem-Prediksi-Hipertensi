@@ -3,7 +3,6 @@ import { Activity, BrainCircuit, Cpu, AlertTriangle, Users, Calendar } from 'luc
 import { usePredictionStore } from '../../../stores/predictionStore';
 import { usePatientStore } from '../../../stores/patientStore';
 import { useSettingsStore } from '../../../stores/settingsStore';
-import { GlowCard } from '../../../components/ui/spotlight-card';
 
 export default function StatsCards() {
   const records = usePredictionStore((state) => state.records);
@@ -46,112 +45,71 @@ export default function StatsCards() {
   return (
     <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-4">
       {/* Metric 1: Total Pasien */}
-      <GlowCard 
-        className="p-5 flex flex-col justify-between"
-        glowColor="blue"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl">
-            <Users className="w-5 h-5" />
-          </div>
+          <Users className="w-5 h-5 text-slate-800 shrink-0" />
         </div>
         <div className="mt-4 text-left">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Pasien</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Pasien</p>
           <p className="text-2xl font-extrabold text-slate-900 mt-1">{patients.length}</p>
         </div>
-      </GlowCard>
+      </div>
 
       {/* Metric 2: Total Klasifikasi */}
-      <GlowCard 
-        className="p-5 flex flex-col justify-between"
-        glowColor="purple"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-purple-50 text-purple-600 border border-purple-100 rounded-xl">
-            <Activity className="w-5 h-5" />
-          </div>
+          <Activity className="w-5 h-5 text-slate-800 shrink-0" />
         </div>
         <div className="mt-4 text-left">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Klasifikasi</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Klasifikasi</p>
           <p className="text-2xl font-extrabold text-slate-900 mt-1">{records.length}</p>
         </div>
-      </GlowCard>
+      </div>
 
       {/* Metric 3: Klasifikasi Hari Ini */}
-      <GlowCard 
-        className="p-5 flex flex-col justify-between"
-        glowColor="green"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl">
-            <Calendar className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 select-none">Hari Ini</span>
+          <Calendar className="w-5 h-5 text-slate-800 shrink-0" />
         </div>
         <div className="mt-4 text-left">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Klasifikasi Hari Ini</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider" title="Total pemeriksaan klasifikasi yang tercatat pada hari ini">Klasifikasi Hari Ini</p>
           <p className="text-2xl font-extrabold text-slate-900 mt-1">{classificationsTodayCount}</p>
         </div>
-      </GlowCard>
+      </div>
 
       {/* Metric 4: Rata-rata Confidence */}
-      <GlowCard 
-        className="p-5 flex flex-col justify-between"
-        glowColor="orange"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl">
-            <BrainCircuit className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 select-none">Medis</span>
+          <BrainCircuit className="w-5 h-5 text-slate-800 shrink-0" />
         </div>
         <div className="mt-4 text-left">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rerata Confidence</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider" title="Rerata tingkat keyakinan prediksi dari seluruh rekor klinis">Rerata Confidence</p>
           <p className="text-2xl font-extrabold text-slate-900 mt-1">{avgConfidence !== null ? `${avgConfidence}%` : '—'}</p>
         </div>
-      </GlowCard>
+      </div>
 
       {/* Metric 5: Model Classifier Aktif */}
-      <GlowCard 
-        className="p-5 flex flex-col justify-between"
-        glowColor="blue"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl">
-            <Cpu className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm select-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-            Aktif
-          </span>
+          <Cpu className="w-5 h-5 text-slate-800 shrink-0" />
         </div>
         <div className="mt-4 text-left">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Model Classifier</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider" title="Model Machine Learning yang aktif digunakan untuk inferensi">Model Classifier</p>
           <p className="text-sm font-extrabold text-slate-900 mt-1.5 truncate">Decision Tree <br/>& Random Forest</p>
         </div>
-      </GlowCard>
+      </div>
 
       {/* Metric 6: Pasien Risiko Tinggi */}
-      <GlowCard 
-        className="p-5 flex flex-col justify-between"
-        glowColor="red"
-        customSize={true}
-      >
+      <div className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
         <div className="flex justify-between items-start">
-          <div className="p-3 bg-red-50 text-red-600 border border-red-100 rounded-xl">
-            <AlertTriangle className="w-5 h-5" />
-          </div>
+          <AlertTriangle className="w-5 h-5 text-slate-800 shrink-0" />
         </div>
         <div className="mt-4 text-left">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Risiko Tinggi (Tingkat 2)</p>
-          <p className="text-2xl font-extrabold text-rose-600 mt-1">{highRiskPatientsCount}</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider" title="Pasien teridentifikasi dengan klasifikasi Hipertensi Tingkat 2">Risiko Tinggi (Tingkat 2)</p>
+          <p className="text-2xl font-extrabold text-slate-900 mt-1">{highRiskPatientsCount}</p>
         </div>
-      </GlowCard>
+      </div>
     </section>
   );
 }
+

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ModelConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\DoctorProfileResource;
 
 class SettingsController extends Controller
@@ -123,6 +124,45 @@ class SettingsController extends Controller
         );
 
         return new DoctorProfileResource($user);
+    }
+
+    /**
+     * Change authenticated user password
+     */
+    public function changePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed',
+        ], [
+            'current_password.required' => 'Kata sandi lama wajib diisi.',
+            'new_password.required' => 'Kata sandi baru wajib diisi.',
+            'new_password.min' => 'Kata sandi baru minimal 6 karakter.',
+            'new_password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'message' => 'Kata sandi lama yang Anda masukkan tidak sesuai.'
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($validated['new_password']),
+        ]);
+
+        \App\Models\Notification::logActivity(
+            $user->id,
+            'Kata Sandi Diperbarui',
+            "Pengguna Dr. {$user->name} berhasil memperbarui kata sandi akun.",
+            'success'
+        );
+
+        return response()->json([
+            'message' => 'Kata sandi berhasil diperbarui.'
+        ]);
     }
 
     /**

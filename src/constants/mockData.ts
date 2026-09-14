@@ -224,6 +224,38 @@ export const initialRecords: PredictionRecord[] = [
     height: 173,
     bmi: 24.1,
     result: 'Tingkat 1'
+  },
+  {
+    id: 'PAS-006',
+    patientId: 'PT-2023-002',
+    patientName: 'Siti Aminah',
+    date: '10 Okt 2023, 11:15',
+    modelUsed: 'Random Forest',
+    confidenceScore: 89,
+    systolic: 142,
+    diastolic: 91,
+    age: 42,
+    gender: 'P',
+    weight: 58,
+    height: 160,
+    bmi: 22.7,
+    result: 'Tingkat 1'
+  },
+  {
+    id: 'PAS-007',
+    patientId: 'PT-2023-004',
+    patientName: 'Hendro Siswanto',
+    date: '07 Okt 2023, 13:50',
+    modelUsed: 'Random Forest',
+    confidenceScore: 95,
+    systolic: 184,
+    diastolic: 122,
+    age: 61,
+    gender: 'L',
+    weight: 82,
+    height: 170,
+    bmi: 28.4,
+    result: 'Tingkat 2'
   }
 ];
 

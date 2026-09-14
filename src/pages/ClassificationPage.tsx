@@ -27,7 +27,7 @@ export default function ClassificationPage() {
     setPatientType,
     setSelectedPatientId,
     setPatientName,
-    setIsSaved,
+    selectRegisteredPatient,
 
     currentResult,
     currentConfidence,
@@ -44,15 +44,11 @@ export default function ClassificationPage() {
 
   useEffect(() => {
     if (importedPatient) {
-      setPatientType('registered');
-      setSelectedPatientId(importedPatient.id);
-      setPatientName(importedPatient.name);
-      setUsia(importedPatient.age);
-      setGender(importedPatient.gender);
+      selectRegisteredPatient(importedPatient);
       // Clean router state to avoid repeating on page reload
       window.history.replaceState({}, document.title);
     }
-  }, [importedPatient, setPatientType, setSelectedPatientId, setPatientName, setUsia, setGender]);
+  }, [importedPatient, selectRegisteredPatient]);
 
   return (
     <div className="max-w-7xl mx-auto animate-fadeIn select-none">
@@ -83,6 +79,7 @@ export default function ClassificationPage() {
             setPatientType={setPatientType}
             setSelectedPatientId={setSelectedPatientId}
             setPatientName={setPatientName}
+            onSelectPatient={selectRegisteredPatient}
           />
         </div>
 
@@ -93,6 +90,8 @@ export default function ClassificationPage() {
             confidence={currentConfidence}
             accuracyDT={accuracyDT}
             accuracyRF={accuracyRF}
+            sistolik={sistolik}
+            diastolik={diastolik}
             patientType={patientType}
             patientName={patientName}
             isSaved={isSaved}

@@ -74,7 +74,7 @@ export default function Header() {
         {/* Mobile menu trigger */}
         <button
           onClick={toggleOpenMobile}
-          className="md:hidden text-slate-500 hover:text-slate-800 p-2 hover:bg-slate-50 border border-slate-200 rounded-xl transition-all cursor-pointer"
+          className="md:hidden text-slate-700 hover:text-slate-900 p-2 bg-white hover:bg-slate-50 border border-slate-200 border-b-2 rounded-xl shadow-xs active:translate-y-[1px] transition-all cursor-pointer"
         >
           <Menu className="w-5.5 h-5.5" />
         </button>
@@ -98,11 +98,11 @@ export default function Header() {
               setNotificationsOpen(!notificationsOpen);
               setProfileDropdownOpen(false);
             }}
-            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 hover:border-blue-100 p-2.5 rounded-2xl transition-all duration-200 relative cursor-pointer"
+            className="text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 border-b-2 p-2.5 rounded-xl shadow-xs active:translate-y-[1px] transition-all duration-200 relative cursor-pointer"
           >
             <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-600" />
             )}
           </button>
 
@@ -114,17 +114,17 @@ export default function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-xl border border-slate-150 z-50 overflow-hidden"
+                  className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-lg border border-slate-200 z-50 overflow-hidden"
                 >
                   <div className="p-4 border-b border-slate-100 flex justify-between items-center">
                     <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pemberitahuan</span>
                     {unreadCount > 0 && (
-                      <span 
+                      <button 
                         onClick={markAllAsRead}
-                        className="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors px-2.5 py-1 rounded-full select-none cursor-pointer"
+                        className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors select-none cursor-pointer"
                       >
                         Tandai sudah baca
-                      </span>
+                      </button>
                     )}
                   </div>
                   <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
@@ -156,7 +156,7 @@ export default function Header() {
                             <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                               {!notif.isRead && (
                                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                  notif.type === 'danger' ? 'bg-red-500 animate-pulse' :
+                                  notif.type === 'danger' ? 'bg-red-500' :
                                   notif.type === 'warning' ? 'bg-amber-500' :
                                   notif.type === 'success' ? 'bg-emerald-500' : 'bg-blue-500'
                                 }`} />
@@ -183,12 +183,12 @@ export default function Header() {
               setProfileDropdownOpen(!profileDropdownOpen);
               setNotificationsOpen(false);
             }}
-            className="flex items-center gap-3 p-1.5 pr-4 border border-slate-200 hover:border-blue-150 bg-slate-50/40 hover:bg-blue-50/20 rounded-2xl cursor-pointer transition-all active:scale-98 relative"
+            className="flex items-center gap-3 p-1.5 pr-4 border border-slate-200 border-b-2 bg-white hover:bg-slate-50 rounded-xl cursor-pointer shadow-xs active:translate-y-[1px] transition-all relative"
           >
             <img
               alt="Logo Dinas Kesehatan"
               referrerPolicy="no-referrer"
-              className="w-9 h-9 rounded-xl border border-blue-100 object-contain bg-white pointer-events-none p-0.5"
+              className="w-9 h-9 rounded-lg border border-slate-200 object-contain bg-white pointer-events-none p-0.5"
               src="/logo_dinkes.png"
             />
             <div className="hidden md:block text-left">
@@ -206,47 +206,36 @@ export default function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-150 z-50 p-4"
+                  className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-slate-200 z-50 p-4"
                 >
                   <div className="flex gap-3 pb-3 border-b border-slate-100 select-none">
                     <img
                       alt="Logo Dinas Kesehatan"
                       referrerPolicy="no-referrer"
-                      className="w-11 h-11 rounded-xl object-contain bg-white border border-slate-200 p-0.5"
+                      className="w-11 h-11 rounded-lg object-contain bg-white border border-slate-200 p-0.5"
                       src="/logo_dinkes.png"
                     />
                     <div>
                       <h3 className="text-xs font-bold text-slate-800 leading-snug">{doctor.name}</h3>
-                      <p className="text-[10px] font-bold text-blue-600 mt-0.5">{doctor.specialty}</p>
-                      <p className="text-[9px] font-semibold text-slate-400 mt-0.5">{doctor.hospital}</p>
+                      <p className="text-[10px] font-semibold text-slate-500 mt-0.5">{doctor.specialty}</p>
+                      <p className="text-[9px] font-medium text-slate-400 mt-0.5">{doctor.hospital}</p>
                     </div>
                   </div>
 
-                  <ul className="py-2.5 space-y-1 pl-0 list-none">
-                    <li>
-                      <button
-                        onClick={handleEditProfileClick}
-                        className="w-full text-left flex items-center gap-2.5 px-3 py-2 text-[12px] font-semibold text-slate-700 hover:text-blue-700 hover:bg-blue-50/50 rounded-xl transition-all cursor-pointer"
-                      >
-                        <UserRound className="w-4 h-4 text-slate-400 group-hover:text-blue-500" />
-                        <span>Edit Profil Anda</span>
-                      </button>
-                    </li>
-                    <li className="select-none">
-                      <div className="flex items-center justify-between px-3 py-2 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl font-bold uppercase tracking-wider">
-                        <div className="flex items-center gap-1.5">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Kredibilitas Medis</span>
-                        </div>
-                        <CircleCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      </div>
-                    </li>
-                  </ul>
+                  <div className="py-2">
+                    <button
+                      onClick={handleEditProfileClick}
+                      className="w-full text-left flex items-center gap-2.5 px-3 py-2 text-[12px] font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all cursor-pointer"
+                    >
+                      <UserRound className="w-4 h-4 text-slate-700" />
+                      <span>Edit Profil Anda</span>
+                    </button>
+                  </div>
 
                   <div className="border-t border-slate-100 pt-2.5 mt-1">
                     <button
                       onClick={handleLogoutClick}
-                      className="w-full text-center py-2 text-[12px] font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors cursor-pointer"
+                      className="w-full text-center py-2 text-[12px] font-bold text-white bg-red-600 hover:bg-red-700 border border-red-700 border-b-2 shadow-xs active:translate-y-[1px] rounded-lg transition-all cursor-pointer"
                     >
                       Logout dari Sistem
                     </button>
