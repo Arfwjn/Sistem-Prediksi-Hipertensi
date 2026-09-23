@@ -3,9 +3,13 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowRight, ShieldCheck, KeyRound, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { useFacilityStore } from '../stores/facilityStore';
 import api from '../services/api';
 
+type Step = 'request' | 'reset' | 'done';
+
 export default function ForgotPasswordPage() {
+  const namaPuskesmas = useFacilityStore((s) => s.facility.namaPuskesmas);
   const [step, setStep] = useState<Step>('request');
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
@@ -125,7 +129,7 @@ export default function ForgotPasswordPage() {
 
           {/* STEP 1: Request reset token */}
           {step === 'request' && (
-            <form onSubmit={handleRequestToken} className="space-y-4">
+            <form onSubmit={handleRequestToken} className="space-y-4" autoComplete="off">
               <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-600 tracking-wide" htmlFor="fp-email">Alamat Email</label>
                 <div className={`relative rounded-xl transition-all duration-300 ${focusedField === 'email' ? 'ring-2 ring-amber-400/40 ring-offset-1' : ''}`}>
@@ -134,13 +138,15 @@ export default function ForgotPasswordPage() {
                   </div>
                   <input
                     id="fp-email"
+                    name="email"
                     type="email"
                     required
+                    autoComplete="off"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Masukkan email terdaftar"
+                    placeholder="Masukkan email"
                     className="w-full pl-10 pr-4 py-3 bg-slate-50/80 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-amber-400 transition-all text-sm font-medium"
                   />
                 </div>
@@ -162,7 +168,7 @@ export default function ForgotPasswordPage() {
 
           {/* STEP 2: Enter token + new password */}
           {step === 'reset' && (
-            <form onSubmit={handleResetPassword} className="space-y-3.5">
+            <form onSubmit={handleResetPassword} className="space-y-3.5" autoComplete="off">
               {/* Token */}
               <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-600 tracking-wide" htmlFor="fp-token">Token Reset</label>
@@ -172,13 +178,15 @@ export default function ForgotPasswordPage() {
                   </div>
                   <input
                     id="fp-token"
+                    name="reset_token"
                     type="text"
                     required
+                    autoComplete="one-time-code"
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
                     onFocus={() => setFocusedField('token')}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Masukkan token dari email"
+                    placeholder="Masukkan token reset"
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-amber-400 transition-all text-sm font-medium"
                   />
                 </div>
@@ -193,13 +201,15 @@ export default function ForgotPasswordPage() {
                   </div>
                   <input
                     id="fp-password"
+                    name="new_password"
                     type={showPassword ? 'text' : 'password'}
                     required
+                    autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onFocus={() => setFocusedField('newpass')}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Minimal 6 karakter"
+                    placeholder="Masukkan password"
                     className="w-full pl-10 pr-11 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-amber-400 transition-all text-sm font-medium"
                   />
                   <button
@@ -221,13 +231,15 @@ export default function ForgotPasswordPage() {
                   </div>
                   <input
                     id="fp-password-confirm"
+                    name="new_password_confirmation"
                     type={showPassword ? 'text' : 'password'}
                     required
+                    autoComplete="new-password"
                     value={passwordConfirmation}
                     onChange={(e) => setPasswordConfirmation(e.target.value)}
                     onFocus={() => setFocusedField('confirmpass')}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Ulangi password baru"
+                    placeholder="Ulangi password"
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-amber-400 transition-all text-sm font-medium"
                   />
                 </div>
@@ -302,13 +314,13 @@ export default function ForgotPasswordPage() {
             className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="font-medium">Puskesmas Kembaran 1</span>
+            <span className="font-medium">{namaPuskesmas || 'Puskesmas 1 Kembaran'}</span>
           </motion.div>
         </div>
 
         {/* Bottom brand tag */}
         <p className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none">
-          Klasifikasi Hipertensi Puskesmas Kembaran 1 &copy; {new Date().getFullYear()}
+          Klasifikasi Hipertensi {namaPuskesmas || 'Puskesmas 1 Kembaran'} &copy; {new Date().getFullYear()}
         </p>
       </div>
     </div>

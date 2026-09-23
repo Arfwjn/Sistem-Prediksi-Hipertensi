@@ -3,11 +3,13 @@ import { motion } from 'motion/react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
+import { useFacilityStore } from '../stores/facilityStore';
 import { Button } from '../components/ui/Button';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoggedIn } = useAuthStore();
+  const namaPuskesmas = useFacilityStore((s) => s.facility.namaPuskesmas);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -64,7 +66,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -91,8 +93,10 @@ export default function LoginPage() {
                 </div>
                 <input
                   id="username"
+                  name="username"
                   type="text"
                   required
+                  autoComplete="off"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   onFocus={() => setFocusedField('username')}
@@ -119,8 +123,10 @@ export default function LoginPage() {
                 </div>
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocusedField('password')}
@@ -227,13 +233,13 @@ export default function LoginPage() {
             className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-400"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="font-medium">Puskesmas Kembaran 1</span>
+            <span className="font-medium">{namaPuskesmas || 'Puskesmas 1 Kembaran'}</span>
           </motion.div>
         </div>
 
         {/* Bottom brand tag */}
         <p className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none">
-          Klasifikasi Hipertensi Puskemas Kembaran 1 &copy; {new Date().getFullYear()}
+          Klasifikasi Hipertensi {namaPuskesmas || 'Puskesmas 1 Kembaran'} &copy; {new Date().getFullYear()}
         </p>
       </div>
     </div>

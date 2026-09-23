@@ -5,6 +5,7 @@ import { usePatientStore } from '../../../stores/patientStore';
 import { predictionService } from '../../../services/predictionService';
 import { classifyHypertension, HypertensionLevel } from '../../../utils/hypertension';
 import { Patient, PredictionRecord } from '../../../types';
+import { showAlert } from '../../../stores/dialogStore';
 
 interface PredictionFormState {
   usia: number | '';
@@ -129,17 +130,29 @@ export function usePrediction() {
     const { usia, berat, tinggi, sistolik, diastolik, patientType, selectedPatientId, patientName } = store;
     
     if (patientType === 'registered' && !selectedPatientId) {
-      alert('Mohon pilih pasien terdaftar terlebih dahulu.');
+      await showAlert({
+        title: 'Pasien Belum Dipilih',
+        message: 'Mohon pilih pasien terdaftar terlebih dahulu sebelum melakukan klasifikasi.',
+        variant: 'warning',
+      });
       return false;
     }
     
     if (patientType === 'new' && !patientName.trim()) {
-      alert('Mohon isi nama lengkap pasien baru.');
+      await showAlert({
+        title: 'Nama Pasien Kosong',
+        message: 'Mohon isi nama lengkap pasien baru.',
+        variant: 'warning',
+      });
       return false;
     }
 
     if (!usia || !berat || !tinggi || !sistolik || !diastolik) {
-      alert('Mohon isi semua data klinis pasien terlebih dahulu.');
+      await showAlert({
+        title: 'Data Klinis Belum Lengkap',
+        message: 'Mohon isi semua data klinis pasien (usia, berat, tinggi, sistolik, diastolik) terlebih dahulu.',
+        variant: 'warning',
+      });
       return false;
     }
 
@@ -292,7 +305,11 @@ export function usePrediction() {
   const handleSaveNewPatient = async (): Promise<boolean> => {
     const { patientName, usia, gender, currentResult, berat, tinggi, sistolik, diastolik } = store;
     if (!patientName || !usia || !gender || !currentResult) {
-      alert('Data tidak lengkap untuk menyimpan pasien.');
+      await showAlert({
+        title: 'Data Belum Lengkap',
+        message: 'Data tidak lengkap untuk menyimpan pasien baru ke database.',
+        variant: 'warning',
+      });
       return false;
     }
     
@@ -330,7 +347,11 @@ export function usePrediction() {
       return true;
     } catch (error) {
       console.error('Gagal menyimpan data pasien baru:', error);
-      alert('Gagal mendaftarkan pasien ke database.');
+      await showAlert({
+        title: 'Pendaftaran Gagal',
+        message: 'Gagal mendaftarkan pasien ke database. Periksa koneksi backend.',
+        variant: 'danger',
+      });
       return false;
     } finally {
       store.setIsClassifying(false);

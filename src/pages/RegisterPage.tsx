@@ -3,10 +3,12 @@ import { motion } from 'motion/react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, ArrowRight, Eye, EyeOff, ShieldCheck, Mail, UserPlus } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { useFacilityStore } from '../stores/facilityStore';
 import api from '../services/api';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const namaPuskesmas = useFacilityStore((s) => s.facility.namaPuskesmas);
 
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -88,7 +90,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3.5">
+          <form onSubmit={handleSubmit} className="space-y-3.5" autoComplete="off">
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -117,8 +119,10 @@ export default function RegisterPage() {
                 </div>
                 <input
                   id="reg-name"
+                  name="name"
                   type="text"
                   required
+                  autoComplete="off"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onFocus={() => setFocusedField('name')}
@@ -138,8 +142,10 @@ export default function RegisterPage() {
                 </div>
                 <input
                   id="reg-username"
+                  name="username"
                   type="text"
                   required
+                  autoComplete="off"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   onFocus={() => setFocusedField('username')}
@@ -159,8 +165,10 @@ export default function RegisterPage() {
                 </div>
                 <input
                   id="reg-email"
+                  name="email"
                   type="email"
                   required
+                  autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onFocus={() => setFocusedField('email')}
@@ -180,13 +188,15 @@ export default function RegisterPage() {
                 </div>
                 <input
                   id="reg-password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocusedField('password')}
                   onBlur={() => setFocusedField(null)}
-                  placeholder="Minimal 6 karakter"
+                  placeholder="Masukkan password"
                   className="w-full pl-10 pr-11 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-400 transition-all text-sm font-medium"
                 />
                 <button
@@ -208,8 +218,10 @@ export default function RegisterPage() {
                 </div>
                 <input
                   id="reg-password-confirm"
+                  name="password_confirmation"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="new-password"
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
                   onFocus={() => setFocusedField('passwordConfirm')}
@@ -268,13 +280,13 @@ export default function RegisterPage() {
             className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="font-medium">Puskesmas Kembaran 1</span>
+            <span className="font-medium">{namaPuskesmas || 'Puskesmas 1 Kembaran'}</span>
           </motion.div>
         </div>
 
         {/* Bottom brand tag */}
         <p className="text-center text-[11px] text-slate-400 mt-5 font-medium select-none">
-          Klasifikasi Hipertensi Puskesmas Kembaran 1 &copy; {new Date().getFullYear()}
+          Klasifikasi Hipertensi {namaPuskesmas || 'Puskesmas 1 Kembaran'} &copy; {new Date().getFullYear()}
         </p>
       </div>
     </div>

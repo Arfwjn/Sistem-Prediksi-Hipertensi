@@ -90,7 +90,7 @@ const MultiIconDisplay = memo(({ icons }: MultiIconDisplayProps) => {
 });
 MultiIconDisplay.displayName = "MultiIconDisplay";
 
-const Background = () => null;
+const Background = (_props?: { theme?: 'light' | 'dark' | 'neutral' }) => null;
 
 export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(({
   title,

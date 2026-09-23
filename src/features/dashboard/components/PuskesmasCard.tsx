@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Award, Map, ExternalLink, Clock, HeartHandshake, X } from 'lucide-react';
+import { MapPin, Phone, Mail, Award, Map, ExternalLink, Clock, HeartHandshake, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useFacilityStore } from '../../../stores/facilityStore';
 
 export default function PuskesmasCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const facility = useFacilityStore((state) => state.facility);
 
-  const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=Puskesmas+1+Kembaran+Banyumas";
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    (facility.namaPuskesmas || 'Puskesmas 1 Kembaran') + ' ' + (facility.alamat || 'Banyumas')
+  )}`;
 
   return (
     <div className="px-4 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-stretch">
@@ -16,7 +20,7 @@ export default function PuskesmasCard() {
           <div className="w-full h-40 rounded-xl overflow-hidden border border-slate-200 shadow-xs relative shrink-0">
             <img 
               src="/puskesmas_building.png" 
-              alt="Gedung Puskesmas 1 Kembaran" 
+              alt={`Gedung ${facility.namaPuskesmas}`} 
               className="w-full h-full object-cover select-none pointer-events-none"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none" />
@@ -26,7 +30,7 @@ export default function PuskesmasCard() {
           <div className="flex items-center gap-3 shrink-0 bg-slate-50/60 p-2.5 rounded-xl border border-slate-200/80 shadow-xs w-full justify-center mt-4">
             <img 
               src="/logo_banyumas.png" 
-              alt="Logo Banyumas" 
+              alt="Logo Daerah" 
               className="h-10 w-auto object-contain select-none pointer-events-none"
             />
             <div className="h-7 w-[1px] bg-slate-200" />
@@ -50,35 +54,45 @@ export default function PuskesmasCard() {
         <div className="p-5 sm:p-6 flex flex-col justify-between h-full bg-white border border-slate-200 rounded-xl shadow-xs hover:border-slate-300 transition-colors text-left gap-4">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">Puskesmas 1 Kembaran</h2>
-              <span 
-                className="text-xs font-semibold text-slate-500 cursor-help select-none"
-                title="Puskesmas 1 Kembaran terakreditasi Paripurna oleh Kementerian Kesehatan RI"
-              >
-                (Akreditasi Paripurna)
-              </span>
+              <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                {facility.namaPuskesmas}
+              </h2>
+              {facility.akreditasi && (
+                <span 
+                  className="text-xs font-semibold text-slate-500 cursor-help select-none"
+                  title={`${facility.namaPuskesmas} ${facility.akreditasi}`}
+                >
+                  ({facility.akreditasi})
+                </span>
+              )}
             </div>
             
             <p className="text-xs font-semibold text-slate-400 flex items-center gap-2 flex-wrap border-b border-slate-100 pb-3">
-              <span className="font-bold text-slate-700">Kode Puskesmas:</span> P3302110101
+              <span className="font-bold text-slate-700">Kode Puskesmas:</span> {facility.kodePuskesmas || '-'}
               <span className="text-slate-350">|</span>
-              <span className="font-bold text-slate-600">Wilayah Kerja:</span> Kec. Kembaran (16 Desa)
+              <span className="font-bold text-slate-600">Wilayah Kerja:</span> {facility.wilayahKerja || '-'}
             </p>
 
-            <div className="space-y-2.5 text-xs text-slate-600 font-medium">
+            <div className="space-y-2 text-xs text-slate-600 font-medium">
               <p className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-slate-800 shrink-0 mt-0.5" />
-                <span>Jl. Raya Kembaran No. 1, Kec. Kembaran, Kab. Banyumas, Jawa Tengah 53182</span>
+                <span>{facility.alamat}</span>
               </p>
-              <p className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-slate-800 shrink-0" />
-                <span>(0281) 6844243</span>
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <p className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-slate-800 shrink-0" />
+                  <span>{facility.telepon}</span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-slate-800 shrink-0" />
+                  <span className="truncate">{facility.email}</span>
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Action Row: Lihat Selengkapnya (link) & Petunjuk Lokasi (button) */}
-          <div className="flex items-center justify-between gap-4 pt-16 border-t border-slate-100 mt-auto">
+          <div className="flex items-center justify-between gap-4 pt-10 border-t border-slate-100 mt-auto">
             <button
               onClick={() => setIsModalOpen(true)}
               className="text-xs font-bold text-slate-700 hover:text-slate-950 hover:underline underline-offset-4 cursor-pointer transition-colors"
@@ -100,7 +114,6 @@ export default function PuskesmasCard() {
         </div>
       </div>
 
-
       {/* Modal Detail Informasi Puskesmas */}
       <AnimatePresence>
         {isModalOpen && (
@@ -118,15 +131,17 @@ export default function PuskesmasCard() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:max-w-2xl md:mx-auto bg-white rounded-2xl shadow-2xl border border-slate-205 p-6 z-50 text-left overflow-y-auto max-h-[85vh] select-none"
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:max-w-2xl md:mx-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 z-50 text-left overflow-y-auto max-h-[85vh] select-none"
             >
               {/* Header */}
               <div className="flex justify-between items-start border-b border-slate-100 pb-4 mb-4">
                 <div>
                   <h3 className="text-lg font-extrabold text-slate-900">
-                    Profil Puskesmas 1 Kembaran
+                    Profil {facility.namaPuskesmas}
                   </h3>
-                  <p className="text-xs text-slate-400 font-semibold mt-0.5">Kabupaten Banyumas, Jawa Tengah</p>
+                  <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                    {facility.dinasKesehatan} &bull; {facility.pemerintahDaerah}
+                  </p>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -140,41 +155,41 @@ export default function PuskesmasCard() {
               <div className="space-y-4 text-xs text-slate-600 leading-relaxed font-sans">
                 <div>
                   <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] mb-1.5">
-                    Tentang Kami
+                    Tentang Fasilitas Layanan
                   </h4>
                   <p className="font-medium">
-                    Puskesmas 1 Kembaran merupakan unit pelaksana teknis dinas kesehatan kabupaten Banyumas yang menyelenggarakan pelayanan kesehatan tingkat pertama. Puskesmas berkomitmen untuk menyediakan layanan kesehatan yang bermutu, merata, dan terjangkau bagi seluruh lapisan masyarakat di wilayah Kecamatan Kembaran.
+                    {facility.namaPuskesmas} merupakan unit pelaksana teknis {facility.dinasKesehatan.toLowerCase()} yang menyelenggarakan pelayanan kesehatan tingkat pertama. Berkomitmen untuk menyediakan layanan kesehatan yang bermutu, merata, dan terjangkau bagi seluruh lapisan masyarakat di wilayah {facility.wilayahKerja}.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] mb-1.5">
-                      Jam Pelayanan
+                      Kontak & Lokasi
                     </h4>
-                    <ul className="space-y-1 font-semibold list-disc list-inside text-slate-600">
-                      <li>Senin - Kamis: 07:30 - 14:00 WIB</li>
-                      <li>Jumat: 07:30 - 11:00 WIB</li>
-                      <li>Sabtu: 07:30 - 12:30 WIB</li>
+                    <ul className="space-y-1 font-semibold text-slate-600">
+                      <li>&bull; Alamat: {facility.alamat}</li>
+                      <li>&bull; Telepon: {facility.telepon}</li>
+                      <li>&bull; Email: {facility.email}</li>
                     </ul>
                   </div>
 
                   <div>
                     <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] mb-1.5">
-                      Status Pelayanan
+                      Status & Akreditasi
                     </h4>
-                    <ul className="space-y-1 font-semibold list-disc list-inside text-slate-600">
-                      <li>Akreditasi Paripurna (Tertinggi)</li>
-                      <li>Unit Gawat Darurat (UGD) 24 Jam</li>
-                      <li>Puskesmas Rawat Jalan</li>
+                    <ul className="space-y-1 font-semibold text-slate-600">
+                      <li>&bull; Status: {facility.akreditasi || 'Terakreditasi Paripurna'}</li>
+                      <li>&bull; Kode Registrasi: {facility.kodePuskesmas}</li>
+                      <li>&bull; Wilayah: {facility.wilayahKerja}</li>
                     </ul>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] mb-1.5">Visi Puskesmas</h4>
+                  <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] mb-1.5">Visi Pelayanan</h4>
                   <p className="font-medium italic bg-slate-50 border border-slate-100 p-2.5 rounded-xl text-center text-slate-700">
-                    "Terwujudnya pelayanan kesehatan yang bermutu, merata, dan terjangkau menuju masyarakat Kecamatan Kembaran yang sehat secara mandiri."
+                    "Terwujudnya pelayanan kesehatan yang bermutu, merata, dan terjangkau menuju masyarakat {facility.wilayahKerja} yang sehat secara mandiri."
                   </p>
                 </div>
               </div>

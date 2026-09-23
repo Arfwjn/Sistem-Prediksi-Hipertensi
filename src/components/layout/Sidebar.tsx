@@ -4,12 +4,15 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, History, Users, Settings, LogOut, X, BrainCircuit, BarChart3 } from 'lucide-react';
 import { useUIStore } from '../../stores/uiStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useFacilityStore } from '../../stores/facilityStore';
+import { showConfirm } from '../../stores/dialogStore';
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isOpenMobile, setIsOpenMobile } = useUIStore();
   const logout = useAuthStore((state) => state.logout);
+  const namaPuskesmas = useFacilityStore((state) => state.facility.namaPuskesmas);
 
   const menuItems = [
     {
@@ -44,9 +47,16 @@ export default function Sidebar() {
     }
   ];
 
-  const handleLogoutClick = () => {
-    if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-      logout();
+  const handleLogoutClick = async () => {
+    const confirmed = await showConfirm({
+      title: 'Konfirmasi Keluar',
+      message: 'Apakah Anda yakin ingin keluar dari sistem?',
+      confirmText: 'Ya, Keluar',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (confirmed) {
+      await logout();
       navigate('/login');
     }
   };
@@ -57,7 +67,7 @@ export default function Sidebar() {
       <div className="flex items-center gap-3 px-3 mb-6 select-none">
         <img src="/logo_banyumas.png" alt="Logo Puskesmas" className="w-8 h-8 object-contain shrink-0" />
         <div className="min-w-0">
-          <h1 className="text-sm font-bold text-slate-900 leading-tight truncate">Puskesmas 1 Kembaran</h1>
+          <h1 className="text-sm font-bold text-slate-900 leading-tight truncate">{namaPuskesmas || 'Puskesmas 1 Kembaran'}</h1>
           <p className="text-[11px] text-slate-500 font-medium truncate">Sistem Hipertensi AI</p>
         </div>
         {isOpenMobile && (

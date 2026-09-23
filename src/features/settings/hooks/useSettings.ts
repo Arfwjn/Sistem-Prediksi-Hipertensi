@@ -3,20 +3,32 @@ import { useAuthStore } from '../../../stores/authStore';
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { usePatientStore } from '../../../stores/patientStore';
 import { usePredictionStore } from '../../../stores/predictionStore';
+import { useFacilityStore } from '../../../stores/facilityStore';
 import { settingsService } from '../../../services/settingsService';
+import { showConfirm, showAlert } from '../../../stores/dialogStore';
 
 export function useSettings() {
   const { doctor, updateDoctor } = useAuthStore();
+  const { facility, updateFacility } = useFacilityStore();
   const patients = usePatientStore((state) => state.patients);
   const records = usePredictionStore((state) => state.records);
 
-  // 1. Profil Tenaga Medis & Faskes
-  const [docName, setDocName] = useState(doctor.name || 'Dr. Arief Sidik');
-  const [docSpecialty, setDocSpecialty] = useState(doctor.specialty || 'Dokter Penanggung Jawab Klinis');
-  const [docHospital, setDocHospital] = useState(doctor.hospital || 'Puskesmas Banyumas');
-  const [docSip, setDocSip] = useState(() => localStorage.getItem('klinikal_doc_sip') || 'SIP.503/449/123/2023');
-  const [faskesAddress, setFaskesAddress] = useState(() => localStorage.getItem('klinikal_faskes_address') || 'Jl. Raya Banyumas No. 12, Kec. Banyumas, Kab. Banyumas');
-  const [faskesPhone, setFaskesPhone] = useState(() => localStorage.getItem('klinikal_faskes_phone') || '(0281) 796123');
+  // 1. Profil Instansi, Faskes & Tenaga Medis
+  const [pemerintahDaerah, setPemerintahDaerah] = useState(facility.pemerintahDaerah);
+  const [dinasKesehatan, setDinasKesehatan] = useState(facility.dinasKesehatan);
+  const [kotaPengesahan, setKotaPengesahan] = useState(facility.kotaPengesahan);
+
+  const [docHospital, setDocHospital] = useState(facility.namaPuskesmas || doctor.hospital);
+  const [kodePuskesmas, setKodePuskesmas] = useState(facility.kodePuskesmas);
+  const [wilayahKerja, setWilayahKerja] = useState(facility.wilayahKerja);
+  const [faskesAddress, setFaskesAddress] = useState(facility.alamat);
+  const [faskesPhone, setFaskesPhone] = useState(facility.telepon);
+  const [faskesEmail, setFaskesEmail] = useState(facility.email);
+  const [akreditasi, setAkreditasi] = useState(facility.akreditasi);
+
+  const [docName, setDocName] = useState(doctor.name || facility.namaDokter);
+  const [docSpecialty, setDocSpecialty] = useState(doctor.specialty || facility.spesialisasiDokter);
+  const [docSip, setDocSip] = useState(facility.sipDokter);
 
   // 2. Ubah Kata Sandi Akun
   const [currentPassword, setCurrentPassword] = useState('');
@@ -40,12 +52,34 @@ export function useSettings() {
   // Simpan Profil Faskes & Nakes
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!docName.trim() || !docSpecialty.trim()) {
-      alert('Nama Tenaga Medis dan Spesialisasi wajib diisi.');
+    if (!docName.trim() || !docSpecialty.trim() || !docHospital.trim()) {
+      await showAlert({
+        title: 'Data Belum Lengkap',
+        message: 'Nama Tenaga Medis, Spesialisasi, dan Nama Puskesmas wajib diisi.',
+        variant: 'warning',
+      });
       return;
     }
 
     try {
+      // 1. Simpan ke facilityStore (persisted in localStorage for reports, PDFs, sidebars, dashboard)
+      updateFacility({
+        pemerintahDaerah,
+        dinasKesehatan,
+        kotaPengesahan,
+        namaPuskesmas: docHospital,
+        kodePuskesmas,
+        wilayahKerja,
+        alamat: faskesAddress,
+        telepon: faskesPhone,
+        email: faskesEmail,
+        akreditasi,
+        namaDokter: docName,
+        spesialisasiDokter: docSpecialty,
+        sipDokter: docSip,
+      });
+
+      // 2. Sinkronkan ke authStore / profil backend
       await updateDoctor({
         name: docName,
         specialty: docSpecialty,
@@ -55,6 +89,7 @@ export function useSettings() {
       localStorage.setItem('klinikal_doc_sip', docSip);
       localStorage.setItem('klinikal_faskes_address', faskesAddress);
       localStorage.setItem('klinikal_faskes_phone', faskesPhone);
+      localStorage.setItem('klinikal_faskes_email', faskesEmail);
 
       triggerToast('Profil fasilitas kesehatan & nakes berhasil disimpan!', 'success');
     } catch (err: any) {
@@ -108,7 +143,21 @@ export function useSettings() {
     const backupData = {
       system: 'Klinikal Hipertensi CDSS',
       exportedAt: new Date().toISOString(),
-      facility: docHospital,
+      facility: {
+        pemerintahDaerah,
+        dinasKesehatan,
+        kotaPengesahan,
+        namaPuskesmas: docHospital,
+        kodePuskesmas,
+        wilayahKerja,
+        alamat: faskesAddress,
+        telepon: faskesPhone,
+        email: faskesEmail,
+        akreditasi,
+        namaDokter: docName,
+        spesialisasiDokter: docSpecialty,
+        sipDokter: docSip,
+      },
       clinician: docName,
       totalPatients: patients.length,
       totalRecords: records.length,
@@ -119,8 +168,9 @@ export function useSettings() {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
     const downloadAnchor = document.createElement('a');
     const dateStr = new Date().toISOString().split('T')[0];
+    const cleanFaskes = docHospital.toLowerCase().replace(/[^a-z0-9]/g, '_');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `backup_klinikal_hipertensi_${dateStr}.json`);
+    downloadAnchor.setAttribute('download', `backup_klinikal_hipertensi_${cleanFaskes}_${dateStr}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -130,6 +180,16 @@ export function useSettings() {
 
   // Unduh Laporan Rekapitulasi Medis (CSV)
   const handleDownloadRecapCSV = () => {
+    const metaHeader = [
+      `# REKAPITULASI DATA PASIEN & RIWAYAT PEMERIKSAAN HIPERTENSI`,
+      `# Instansi: ${pemerintahDaerah} - ${dinasKesehatan}`,
+      `# Fasilitas: ${docHospital} (Kode: ${kodePuskesmas})`,
+      `# Alamat: ${faskesAddress} | Telp: ${faskesPhone} | Email: ${faskesEmail}`,
+      `# Penanggung Jawab: ${docName} (${docSpecialty} - SIP: ${docSip})`,
+      `# Tanggal Cetak: ${new Date().toLocaleString('id-ID')} WIB`,
+      `#`,
+    ].join('\r\n');
+
     const headers = [
       'No',
       'ID Pasien',
@@ -156,12 +216,13 @@ export function useSettings() {
       p.bpHistory ? p.bpHistory.length : 0,
     ]);
 
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const csvContent = '\uFEFF' + metaHeader + '\r\n' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
+    const cleanFaskes = docHospital.toLowerCase().replace(/[^a-z0-9]/g, '_');
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `rekapitulasi_pasien_hipertensi_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `rekapitulasi_pasien_hipertensi_${cleanFaskes}_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -171,31 +232,60 @@ export function useSettings() {
 
   // Reset Database
   const handleResetDatabase = async () => {
-    if (confirm('PERINGATAN: Apakah Anda yakin ingin mereset seluruh database riwayat prediksi dan pasien ke setelan awal pabrik? Tindakan ini tidak dapat dibatalkan.')) {
+    const confirmed = await showConfirm({
+      title: 'Reset Database Sistem',
+      message: 'PERINGATAN: Apakah Anda yakin ingin mereset seluruh database riwayat prediksi dan pasien ke setelan awal pabrik? Tindakan ini tidak dapat dibatalkan.',
+      confirmText: 'Reset Database',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+
+    if (confirmed) {
       try {
         await useSettingsStore.getState().resetDatabase();
         triggerToast('Database berhasil di-reset ke nilai default klinis.', 'success');
       } catch (e) {
         console.error('Failed to reset database:', e);
-        alert('Gagal mereset database. Pastikan backend server Anda berjalan.');
+        await showAlert({
+          title: 'Gagal Mereset Database',
+          message: 'Gagal mereset database. Pastikan backend server Anda berjalan.',
+          variant: 'danger',
+        });
       }
     }
   };
 
   return {
-    // Profil Faskes
-    docName,
-    setDocName,
-    docSpecialty,
-    setDocSpecialty,
+    // Profil Instansi & Faskes
+    pemerintahDaerah,
+    setPemerintahDaerah,
+    dinasKesehatan,
+    setDinasKesehatan,
+    kotaPengesahan,
+    setKotaPengesahan,
+
     docHospital,
     setDocHospital,
-    docSip,
-    setDocSip,
+    kodePuskesmas,
+    setKodePuskesmas,
+    wilayahKerja,
+    setWilayahKerja,
     faskesAddress,
     setFaskesAddress,
     faskesPhone,
     setFaskesPhone,
+    faskesEmail,
+    setFaskesEmail,
+    akreditasi,
+    setAkreditasi,
+
+    // Tenaga Medis
+    docName,
+    setDocName,
+    docSpecialty,
+    setDocSpecialty,
+    docSip,
+    setDocSip,
     handleSaveProfile,
 
     // Ubah Password

@@ -16,8 +16,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="text-xs font-semibold text-slate-600 tracking-wide uppercase">
-            {label}
+          <label htmlFor={inputId} className="text-xs font-semibold text-slate-700 tracking-normal flex items-center justify-between">
+            <span>{label}</span>
           </label>
         )}
         <div className="relative flex items-center">
@@ -39,7 +39,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // Focus, Hover, Error configurations
               error
                 ? 'border-rose-300 focus:ring-rose-100 focus:border-rose-500 bg-rose-50/10'
-                : 'border-slate-200 hover:border-slate-300 focus:ring-violet-100 focus:border-violet-500'
+                : 'border-slate-200 hover:border-slate-300 focus:ring-blue-100 focus:border-blue-600',
+              className
             )}
             {...props}
           />

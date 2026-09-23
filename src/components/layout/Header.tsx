@@ -5,6 +5,7 @@ import { Menu, Bell, CircleCheck, ShieldCheck, ChevronDown, UserRound } from 'lu
 import { useAuthStore } from '../../stores/authStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useNotificationStore } from '../../stores/notificationStore';
+import { showConfirm } from '../../stores/dialogStore';
 
 export default function Header() {
   const location = useLocation();
@@ -52,13 +53,20 @@ export default function Header() {
     if (path.startsWith('/history')) return 'Riwayat Prediksi Klasifikasi';
     if (path.startsWith('/patients')) return 'Manajemen Data Pasien';
     if (path.startsWith('/evaluasi')) return 'Hasil Evaluasi Model AI';
-    if (path.startsWith('/settings')) return 'Pengaturan Algoritma AI';
+    if (path.startsWith('/settings')) return 'Pengaturan Sistem';
     return 'Clinical Intelligence System';
   };
 
-  const handleLogoutClick = () => {
-    if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-      logout();
+  const handleLogoutClick = async () => {
+    const confirmed = await showConfirm({
+      title: 'Konfirmasi Keluar',
+      message: 'Apakah Anda yakin ingin keluar dari sistem?',
+      confirmText: 'Ya, Keluar',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+    if (confirmed) {
+      await logout();
       navigate('/login');
     }
   };

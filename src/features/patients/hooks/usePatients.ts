@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { usePatientStore } from '../../../stores/patientStore';
 import { Patient } from '../../../types';
+import { showConfirm, showAlert } from '../../../stores/dialogStore';
 
 export function usePatients() {
   const { patients, addPatient, deletePatient, editPatient } = usePatientStore();
@@ -57,7 +58,11 @@ export function usePatients() {
   const handleCreatePatient = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim() || !newAge) {
-      alert('Nama Lengkap dan Usia wajib diisi.');
+      await showAlert({
+        title: 'Data Belum Lengkap',
+        message: 'Nama Lengkap dan Usia wajib diisi untuk menambahkan pasien baru.',
+        variant: 'warning',
+      });
       return;
     }
 
@@ -97,7 +102,11 @@ export function usePatients() {
     e.preventDefault();
     if (!editingPatient) return;
     if (!editName.trim() || !editAge) {
-      alert('Nama Lengkap dan Usia wajib diisi.');
+      await showAlert({
+        title: 'Data Belum Lengkap',
+        message: 'Nama Lengkap dan Usia wajib diisi untuk memperbarui data pasien.',
+        variant: 'warning',
+      });
       return;
     }
 
@@ -130,8 +139,16 @@ export function usePatients() {
     setEditingPatient(null);
   };
 
-  const handleDeletePatient = (id: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus data pasien ini secara permanen dari sistem?')) {
+  const handleDeletePatient = async (id: string) => {
+    const confirmed = await showConfirm({
+      title: 'Hapus Data Pasien',
+      message: 'Apakah Anda yakin ingin menghapus data pasien ini secara permanen dari sistem? Data yang terhapus tidak dapat dikembalikan.',
+      confirmText: 'Hapus Pasien',
+      cancelText: 'Batal',
+      variant: 'danger',
+    });
+
+    if (confirmed) {
       deletePatient(id);
       if (selectedPatient?.id === id) {
         setSelectedPatient(null);
